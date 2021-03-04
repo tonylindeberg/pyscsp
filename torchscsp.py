@@ -5,12 +5,12 @@ import math
 from math import pi
 import torch
 
-from scsp.discscsp import gaussfiltsize
+from pyscsp.discscsp import gaussfiltsize
 
 # ==>> Import from other Python package awaiting a full PyTorch interface for
 # ==>> the modified Bessel functions that determine the filter coefficients
 # ==>> for the discrete analogue of the Gaussian kernel
-from scsp.discscsp import make1Ddiscgaussfilter
+from pyscsp.discscsp import make1Ddiscgaussfilter
 
 def make1Dgaussfilter(sigma, scspmethod='samplgauss', epsilon=0.01, D=1):
     if (scspmethod == 'samplgauss'):
