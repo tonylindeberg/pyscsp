@@ -20,7 +20,7 @@ def make1Dgaussfilter(sigma, scspmethod='samplgauss', epsilon=0.01, D=1):
         # ==>> That would need a PyTorch interface for modified Bessel functions
         return torch.from_numpy(make1Ddiscgaussfilter(sigma, epsilon, D)).type(torch.FloatTensor)
     elif (scspmethod == 'intgauss'):
-        return make1Dintgaussfilter(sigma, epsilon, D))
+        return make1Dintgaussfilter(sigma, epsilon, D)
     elif (scspmethod == 'linintgauss'):
         return make1Dlinintgaussfilter(sigma, epsilon, D)
     else:
