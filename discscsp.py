@@ -54,7 +54,7 @@ def scspconv(
         sigma : float,
         scspmethod = 'discgauss',
         epsilon : float = 0.00000001) -> np.ndarray :
-    """Computes the scale-space representation of the 2-D image inpic (or a 1-D signa)
+    """Computes the scale-space representation of the 2-D image inpic (or a 1-D signal) 
 at scale level sigma in units of the standard deviation of the Gaussian kernel that 
 is approximated discretely with the method scspmethod and with the formally infinite 
 convolution operation truncated at the tails with a relative approximation error 
