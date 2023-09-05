@@ -100,6 +100,15 @@ less than epsilon.
 Convolution with this kernel corresponds to solving a spatially discretized version
 of the diffusion equation with the time variable = sigma^2 being continuous.
 
+Over a 2-D spatial domain, the resulting scale-space representation obeys
+non-enhancement of local extrema, meaning that the intensity value at any
+spatial maximum is guaranteed to not increase with scale and that the 
+intensity value at any spatial minimum is guaranteed to not decrease.
+
+Over a 1-D spatial domain, the resulting scale-space representation does
+also obey non-creation of local extrema, meaning that the number of local
+extrema in the smoothed signal is guaranteed to not increase with scale.
+
 The spatial standard deviation of the resulting kernel is is exactly equal
 to the scale parameter sigma over an infinite spatial domain. These kernel 
 values do also in the ideal infinite case exactly sum up to one, and are
