@@ -10,49 +10,48 @@ from math import pi
 from typing import NamedTuple
 
 
-# Discrete Scale Space and Scale-Space Derivative Toolbox for Python
-#
-# For computing discrete scale-space smoothing by convolution with the discrete
-# analogue of the Gaussian kernel and for computing discrete derivative approximations
-# by applying central difference operators to the smoothed data. Then, different
-# types of feature detectors can be defined by combining discrete analogues of the
-# Gaussian derivative operators into differential expressions.
-#
-# This code is the result of porting a subset of the routines in the Matlab packages
-# discscsp and discscspders to Python.
-#
-# Note: The scale normalization does not explicitly compensate for the additional 
-# variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
-# for the linearly integrated Gaussian kernel.
-#
-# References:
-#
-# Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-# Pattern Analysis and Machine Intelligence, 12(3): 234--254.
-#
-# Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
-# A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
-# 3(4): 349-376.
-#
-# Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
-#
-# Lindeberg (1998) "Feature detection with automatic scale selection", 
-# International Journal of Computer Vision, vol 30(2): 77-116.
-#
-# Lindeberg (1998) "Edge detection and ridge detection with automatic scale selection", 
-# International Journal of Computer Vision, vol 30(2): 117-154.
+"""Discrete Scale Space and Scale-Space Derivative Toolbox for Python
 
-# Compared to the original Matlab code, the following implementation is reduced in the following ways:
-# - there is no handling of scale normalization powers gamma that are not equal to one
-# - Lp-normalization is only implemented for p = 1
-# - much fewer functions of the N-jet have so far been implemented
-# - there is no passing of additional parameters to functions of the N-jet
-# - this reimplementation has not yet been thoroughly tested
+For computing discrete scale-space smoothing by convolution with the discrete
+analogue of the Gaussian kernel and for computing discrete derivative approximations
+by applying central difference operators to the smoothed data. Then, different
+types of feature detectors can be defined by combining discrete analogues of the
+Gaussian derivative operators into differential expressions.
 
+This code is the result of porting a subset of the routines in the Matlab packages
+discscsp and discscspders to Python.
 
+Note: The scale normalization does not explicitly compensate for the additional 
+variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
+for the linearly integrated Gaussian kernel.
+
+References:
+
+Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+
+Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
+A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
+3(4): 349-376.
+
+Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+
+Lindeberg (1998) "Feature detection with automatic scale selection", 
+International Journal of Computer Vision, vol 30(2): 77-116.
+
+Lindeberg (1998) "Edge detection and ridge detection with automatic scale selection", 
+International Journal of Computer Vision, vol 30(2): 117-154.
+
+Compared to the original Matlab code, the following implementation is reduced in the following ways:
+- there is no handling of scale normalization powers gamma that are not equal to one
+- Lp-normalization is only implemented for p = 1
+- much fewer functions of the N-jet have so far been implemented
+- there is no passing of additional parameters to functions of the N-jet
+- this reimplementation has not yet been thoroughly tested
+"""
 def scspconv(inpic, sigma, scspmethod='discgauss', epsilon=0.00000001):
     if (isinstance(scspmethod, str)):
-        scspmethodname = scspmethod;
+        scspmethodname = scspmethod
     else:
         scspmethodname = scspmethod.methodname
         epsilon = scspmethod.epsilon
@@ -97,7 +96,7 @@ def make1Ddiscgaussfilter(sigma, epsilon=0.00000001, D=1):
     # Generate filter coefficients from modified Bessel functions
     longhalffiltvec = ive(np.arange(0, tmpvecsize+1), s)
     halffiltvec = truncfilter(longhalffiltvec, truncerrtransf(epsilon, D))
-    filtvec = mirrorhfilter(halffiltvec);
+    filtvec = mirrorhfilter(halffiltvec)
     return filtvec
 
 
@@ -124,11 +123,11 @@ def samplgaussconv(inpic, sigma, epsilon=0.00000001):
 def make1Dsamplgaussfilter(sigma, epsilon=0.00000001, D=1):
     vecsize = np.ceil(1.1*gaussfiltsize(sigma, epsilon, D))
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
-    return gauss(x, sigma);
+    return gauss(x, sigma)
 
 
 def gauss(x, sigma=1.0):
-    return 1/(sqrt(2*pi)*sigma)*np.exp(-(x**2/(2*sigma**2)));
+    return 1/(sqrt(2*pi)*sigma)*np.exp(-(x**2/(2*sigma**2)))
 
 
 def intgaussconv(inpic, sigma, epsilon=0.00000001):
@@ -387,7 +386,7 @@ def applyNjetfcn(smoothpic, njetfcn, sigma=1.0, normdermethod='discgaussLp'):
             Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
             Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
             Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            outpic = Lx*Lx*Lxx + 2*Lx*Ly*Lxy + Ly*Ly*Lyy;
+            outpic = Lx*Lx*Lxx + 2*Lx*Ly*Lxy + Ly*Ly*Lyy
         elif (njetfcn == 'Lv3Lvvv'):
             # 3rd-order derivative in gradient direction (used for edge detection)
             Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
@@ -399,7 +398,7 @@ def applyNjetfcn(smoothpic, njetfcn, sigma=1.0, normdermethod='discgaussLp'):
             Lxxy = normderfactor(2, 1, sigma, normdermethod) * correlate(smoothpic, dxxymask())
             Lxyy = normderfactor(1, 2, sigma, normdermethod) * correlate(smoothpic, dxyymask())
             Lyyy = normderfactor(0, 3, sigma, normdermethod) * correlate(smoothpic, dyyymask())
-            outpic = Lx*Lx*Lx*Lxxx + 3*Lx*Lx*Ly*Lxxy + 3*Lx*Ly*Ly*Lxyy + Ly*Ly*Ly*Lyyy;
+            outpic = Lx*Lx*Lx*Lxxx + 3*Lx*Lx*Ly*Lxxy + 3*Lx*Ly*Ly*Lxyy + Ly*Ly*Ly*Lyyy
         elif (njetfcn == 'Lp'):
             # 1st-order derivative in principal curvature direction (used for ridge detection)
             Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
@@ -421,7 +420,7 @@ def applyNjetfcn(smoothpic, njetfcn, sigma=1.0, normdermethod='discgaussLp'):
             tmp = (Lxx - Lyy) /(np.finfo(float).eps + np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
             cosbeta = np.sqrt((1 + tmp)/2)
             sinbeta = np.sign(Lxy) * np.sqrt((1 - tmp)/2)
-            outpic = cosbeta * Lx + sinbeta * Ly;
+            outpic = cosbeta * Lx + sinbeta * Ly
         elif (njetfcn == 'Lpp'):
             # 2nd-order derivative in principal curvature direction 
             Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
@@ -659,7 +658,7 @@ def defaultscspnormdermethodobject(scspnormdermethod='discgaussLp', gamma=1.0):
     elif (scspnormdermethod == 'linintgaussLp'):
         object = scspnormdermethodobject('linintgauss', 'Lpnorm', gamma)
     else:
-        error('Scale-space derivative method %s not implemented yet' % scspnormdermethod)
+        raise ValueError('Scale-space derivative method %s not implemented yet', scspnormdermethod)
     return object
 
 
@@ -687,9 +686,6 @@ def variance(filter):
 
     xmean, ymean = filtermean(filter)
 
-    xvar = x2mom - xmean*xmean
-    yvar = y2mom - ymean*ymean
-    
     return [[x2mom - xmean*xmean, xymom - xmean*ymean], \
             [xymom - xmean*ymean, y2mom - ymean*ymean]]
 

@@ -13,31 +13,30 @@ from pyscsp.discscsp import gaussfiltsize
 from pyscsp.discscsp import make1Ddiscgaussfilter
 
 
-# Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch
-#
-# For computing discrete scale-space smoothing by convolution with the discrete
-# analogue of the Gaussian kernel and for computing discrete derivative approximations
-# by applying central difference operators to the smoothed data. 
-#
-# This code is the result of porting a subset of the routines in the Matlab packages
-# discscsp and discscspders to Python.
-#
-# Note: The scale normalization does not explicitly compensate for the additional 
-# variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
-# for the linearly integrated Gaussian kernel.
-#
-# References:
-#
-# Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-# Pattern Analysis and Machine Intelligence, 12(3): 234--254.
-#
-# Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
-# A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
-# 3(4): 349-376.
-#
-# Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+"""Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch
 
+For computing discrete scale-space smoothing by convolution with the discrete
+analogue of the Gaussian kernel and for computing discrete derivative approximations
+by applying central difference operators to the smoothed data. 
 
+This code is the result of porting a subset of the routines in the Matlab packages
+discscsp and discscspders to Python.
+
+Note: The scale normalization does not explicitly compensate for the additional 
+variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
+for the linearly integrated Gaussian kernel.
+
+References:
+
+Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+
+Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
+A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
+3(4): 349-376.
+
+Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+"""
 def make1Dgaussfilter(sigma, scspmethod='samplgauss', epsilon=0.01, D=1):
     if (scspmethod == 'samplgauss'):
         return make1Dsamplgaussfilter(sigma, epsilon, D)
@@ -60,7 +59,7 @@ def make1Dsamplgaussfilter(sigma, epsilon=0.01, D=1):
 
 
 def gauss(x, sigma=1.0):
-    return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)));
+    return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)))
 
 
 def make1Dintgaussfilter(sigma, epsilon=0.01, D=1):
