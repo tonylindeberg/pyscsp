@@ -47,7 +47,7 @@ Compared to the original Matlab code, the following implementation is reduced in
 """
 
 # Note! The arguments scspmethod and normdermethod, which may be either strings
-# or objects are not typed. The classes have not been typed either.
+# or objects are not typed. 
 
 def scspconv(
         inpic,
@@ -865,7 +865,7 @@ class ScSpMethod(NamedTuple):
     epsilon: float
 
 
-def discgaussmethod(epsilon : float):
+def discgaussmethod(epsilon : float) -> ScSpMethod:
     return ScSpMethod('discgauss', epsilon)
 
 
@@ -879,13 +879,13 @@ def scspnormdermethodobject(
         scspmethod : str = 'discgauss',
         normdermethod : str = 'Lpnorm',
         gamma : float = 1.0,
-        epsilon : float = 0.00000001):
+        epsilon : float = 0.00000001) -> ScSpNormDerMethod :
     return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod, gamma)
 
 
 def defaultscspnormdermethodobject(
         scspnormdermethod : str ='discgaussLp',
-        gamma : float = 1.0):
+        gamma : float = 1.0) -> ScSpNormDerMethod:
     if (scspnormdermethod == 'discgauss'):
         object = scspnormdermethodobject('discgauss', 'none', gamma)
     elif (scspnormdermethod == 'discgaussvar'):
