@@ -46,6 +46,9 @@ Compared to the original Matlab code, the following implementation is reduced in
 - this reimplementation has not yet been thoroughly tested
 """
 
+# Note! The arguments scspmethod and normdermethod, which may be either strings
+# or objects are not typed. The classes have not been typed either.
+
 def scspconv(
         inpic,
         sigma : float,
@@ -466,7 +469,7 @@ def computeNjetfcn(
         inpic,
         njetfcn : str,
         sigma : float,
-        normdermethod : str = 'discgaussLp') -> np.ndarray :
+        normdermethod = 'discgaussLp') -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
 of the image inpic at scale level sigma in units of the standard deviation of
 the Gaussian kernel, and using the scale normalization method normdermethod.
@@ -508,7 +511,7 @@ def applyNjetfcn(
         smoothpic,
         njetfcn : str,
         sigma : float = 1.0,
-        normdermethod : str = 'discgaussLp') -> np.ndarray :
+        normdermethod = 'discgaussLp') -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
 to an already computed scale-space representation at scale level sigma in units
 of the standard deviation of the Gaussian kernel, and using the scale normalization
