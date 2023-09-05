@@ -1,12 +1,8 @@
 import numpy as np
-from scipy.ndimage import correlate1d
-from scipy.ndimage import correlate
+from scipy.ndimage import correlate1d, correlate
 from scipy.special import ive
-from math import sqrt
-from scipy.special import erf
-from scipy.special import erfcinv
-from math import exp
-from math import pi
+from math import sqrt, exp, pi
+from scipy.special import erf, erfcinv
 from typing import NamedTuple
 
 
@@ -49,6 +45,7 @@ Compared to the original Matlab code, the following implementation is reduced in
 - there is no passing of additional parameters to functions of the N-jet
 - this reimplementation has not yet been thoroughly tested
 """
+
 def scspconv(inpic, sigma, scspmethod='discgauss', epsilon=0.00000001):
     if (isinstance(scspmethod, str)):
         scspmethodname = scspmethod
