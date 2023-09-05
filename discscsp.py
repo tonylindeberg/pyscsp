@@ -46,7 +46,22 @@ Compared to the original Matlab code, the following implementation is reduced in
 - this reimplementation has not yet been thoroughly tested
 """
 
-def scspconv(inpic, sigma, scspmethod='discgauss', epsilon=0.00000001):
+def scspconv(
+        inpic,
+        sigma : float,
+        scspmethod : str= 'discgauss',
+        epsilon : float = 0.00000001):
+    """Computes the scale-space representation of the image inpic at scale level
+    sigma in units of the standard deviation of the Gaussian kernel that is approximated 
+    discretely with the method scspmethod and with the formally infinite convolution operation
+    truncated at the tails with a relative approximation error less than epsilon.
+
+    The following discrete approximation methods have been implemented:
+      'discgauss' - the discrete analogue of the Gaussian kernel
+      'samplgauss' - the sampled Gaussian kernel
+      'intgauss' - the integrated Gaussian kernel
+      'linintgauss' - the linearily interpolated and integrated Gaussian kernel
+"""
     if (isinstance(scspmethod, str)):
         scspmethodname = scspmethod
     else:
@@ -67,7 +82,13 @@ def scspconv(inpic, sigma, scspmethod='discgauss', epsilon=0.00000001):
     return outpic
 
         
-def discgaussconv(inpic, sigma, epsilon=0.00000001):
+def discgaussconv(
+        inpic,
+        sigma : float,
+        epsilon : float = 0.00000001):
+    """Convolves the image inpic with the discrete analogue of the Gaussian kernel
+with standard deviation sigma and relative truncation error less than epsilon.
+"""
     ndim = inpic.ndim
     sep1Dfilter = make1Ddiscgaussfilter(sigma, epsilon, ndim)
 
@@ -323,7 +344,35 @@ def dyyyymask():
                      [+1]])
 
 
-def computeNjetfcn(inpic, njetfcn, sigma, normdermethod='discgaussLp'):
+def computeNjetfcn(
+        inpic,
+        njetfcn : str,
+        sigma : float,
+        normdermethod : str = 'discgaussLp'):
+    """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
+of the image image at scale level sigma in units of the standard deviation of
+the Gaussian kernel, and using the scale normalization method normdermethod.
+
+Implemented N-jet functions:
+  'L' - smoothed scale-space representation
+  'Lx' - 1:st-order partial derivative in x-direction
+  'Ly' - 1:st-order partial derivative in y-direction
+  'Lxx' - 2:nd-order partial derivative in x-direction
+  'Lxy' - mixed 2nd-order partial derivative in x- and y-directions
+  'Lyy' - 2:nd-order partial derivative in y-direction
+  'Lv' - gradient magnitude
+  'Lv2' - squared gradient magnitude
+  'Laplace' - Laplacian operator
+  'detHessian' - determinant of the Hessian
+  'sqrtdetHessian' - signed square root of absolute value of determinant of the Hessian
+  'Lv2Lvv' - 2:nd-order directional derivative in gradient direction * Lv^2
+  'Lv3Lvvv' - 3:rd-order directional derivative in gradient direction * Lv^3
+  'Lp' - 1:st-order directional derivative in 1:st principal curvature direction
+  'Lq' - 1:st-order directional derivative in 2:nd principal curvature direction
+  'Lpp' - 2:nd-order directional derivative in 1:st principal curvature direction
+  'Lqq' - 2:nd-order directional derivative in 2:nd principal curvature direction
+In addition, 3:rd- and 4:th-order partial derivatives are also implemented.
+"""
     if (isinstance(normdermethod, str)):
         normdermethod = defaultscspnormdermethodobject(normdermethod)
 
@@ -331,7 +380,16 @@ def computeNjetfcn(inpic, njetfcn, sigma, normdermethod='discgaussLp'):
     return applyNjetfcn(smoothpic, njetfcn, sigma, normdermethod)
 
 
-def applyNjetfcn(smoothpic, njetfcn, sigma=1.0, normdermethod='discgaussLp'):
+def applyNjetfcn(
+        smoothpic,
+        njetfcn : str,
+        sigma : float = 1.0,
+        normdermethod : str = 'discgaussLp'):
+    """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
+to an already computed scale-space representation at scale level sigma in units
+of the standard deviation of the Gaussian kernel, and using the scale normalization
+method normdermethod.
+"""
     if (isinstance(normdermethod, str)):
         normdermethod = defaultscspnormdermethodobject(normdermethod)
         
@@ -510,7 +568,13 @@ def normderfactor(xorder, yorder, sigma, normdermethod):
     return value
 
 
-def normgaussder1D_L1norm(order, sigma, gammapar=1.0):
+def normgaussder1D_L1norm(
+        order : int,
+        sigma : float,
+        gammapar : float = 1.0):
+    """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative of order sigma
+and at scale sigma in units of the standard deviation of the Gaussian kernel.
+"""
     s = sigma*sigma
     
     if (order == 0):
@@ -535,6 +599,10 @@ def normgaussder1D_L1norm(order, sigma, gammapar=1.0):
 
 
 def discgaussder1D_L1norm(order, sigma, epsilon=0.00000001):
+    """Returns the L_1-norm of the n:th-order difference of the 1-D discrete analogue 
+of the Gaussian kernel at scale level sigma in units of the standard deviation and 
+truncated at the tails with a relative approximation error less than epsilon.
+"""
     smoothkernel = make1Ddiscgaussfilter(sigma, epsilon, 1)
 
     if (order == 0):
@@ -660,6 +728,7 @@ def defaultscspnormdermethodobject(scspnormdermethod='discgaussLp', gamma=1.0):
 
 
 def variance(filter):
+    """Returns the spatial covariance matrix of 2-D filter, assumed to be non-negative."""
     if (filter.ndim != 2):
         raise ValueError('Only implemented for 2-D filters so far')
 
@@ -688,6 +757,7 @@ def variance(filter):
 
 
 def filtermean(filter):
+    """Returns the spatial mean vector of 2-D filter, assumed to be non-negative."""
     if (filter.ndim != 2):
         raise ValueError('Only implemented for 2-D filters so far')
 
