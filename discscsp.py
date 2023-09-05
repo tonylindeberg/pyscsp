@@ -865,7 +865,7 @@ class ScSpMethod(NamedTuple):
     epsilon: float
 
 
-def discgaussmethod(epsilon : float) -> ScSpMethod:
+def discgaussmethod(epsilon : float) -> ScSpMethod :
     return ScSpMethod('discgauss', epsilon)
 
 
@@ -885,7 +885,7 @@ def scspnormdermethodobject(
 
 def defaultscspnormdermethodobject(
         scspnormdermethod : str ='discgaussLp',
-        gamma : float = 1.0) -> ScSpNormDerMethod:
+        gamma : float = 1.0) -> ScSpNormDerMethod :
     if (scspnormdermethod == 'discgauss'):
         object = scspnormdermethodobject('discgauss', 'none', gamma)
     elif (scspnormdermethod == 'discgaussvar'):
