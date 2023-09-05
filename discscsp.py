@@ -109,7 +109,7 @@ Over a 1-D spatial domain, the resulting scale-space representation does
 also obey non-creation of local extrema, meaning that the number of local
 extrema in the smoothed signal is guaranteed to not increase with scale.
 
-The spatial standard deviation of the resulting kernel is is exactly equal
+The spatial standard deviation of the resulting kernel is exactly equal
 to the scale parameter sigma over an infinite spatial domain. These kernel 
 values do also in the ideal infinite case exactly sum up to one, and are
 also confined in the interval [0, 1].
