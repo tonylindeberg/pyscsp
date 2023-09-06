@@ -147,7 +147,7 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 
 using variance-based normalization of the Gaussian derivative operators 
-scale normalization parameter gamma = 1
+for scale normalization parameter gamma = 1
 """
     return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
 
