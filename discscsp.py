@@ -50,18 +50,18 @@ Compared to the original Matlab code, the following implementation is reduced in
 """
 
 
+# Object for storing the parameters of a scale-space discretization method
 class ScSpMethod(NamedTuple):
     methodname: str # either 'discgauss', 'samplgauss', 'intgauss' or 'linintgauss'
     epsilon: float
 
     
-def discgaussmethod(epsilon : float) -> ScSpMethod :
-    return ScSpMethod('discgauss', epsilon)
-
-
+# Object for storing the parameters of a discretization method for computing
+# scale-normalized derivatives, including also the necessary parameters of the
+# underlying method for discrete approximation of the Gaussian smoothing operation
 class ScSpNormDerMethod(NamedTuple):
     scspmethod: ScSpMethod
-    normdermethod: str # either 'none', 'varnorm' or 'Lpnorm'
+    normdermethod: str # either 'nonormalization', 'varnorm' or 'Lpnorm'
     gamma: float
 
 
@@ -261,7 +261,9 @@ The kernel values of the resulting discrete approximation of the Gaussian kernel
 do in the ideal infinite case exactly sum up to one, and are also confined in the 
 interval [0, 1]. The spatial integration of the Gaussian kernel over the support
 region of each pixel does, however, add a scale offset of 1/12 in units of the
-variance equal to the squared standard deviation of the kernel.
+variance equal to the squared standard deviation of the kernel. This added 
+variance corresponds to the spatial variance of a box filter over the support 
+region of the image pixel over which the continuous Gaussian kernel is integrated.
 
 For a theoretical explanation of these properties, see Section 3.6.3 in
 
@@ -323,6 +325,12 @@ The kernel values of the resulting discrete approximation of the Gaussian kernel
 are confined in the interval [0, 1]. The spatial integration of the Gaussian kernel 
 over the support region of each pixel does, however, add a scale offset of 1/6 in 
 units of the variance equal to the squared standard deviation of the kernel.
+This added variance corresponds to the spatial variance of a triangular 
+extending to the neigbouring pixels, which is used as spatial window function
+when integrating the continuous Gaussian kernel. That triangular filter
+does in turn correspond to the convolution of a box filter over a pixel
+support region by itself, thus explaining the doubling of the scale offset
+in relation to the scale offset for the integrated Gaussian kernel.
 
 For a theoretical explanation of these properties, see Section 3.6.3 in
 
@@ -738,7 +746,7 @@ method normdermethod.
     if (isinstance(normdermethod, str)):
         normdermethod = defaultscspnormdermethodobject(normdermethod)
 
-    if (normdermethod.normdermethod == 'none'):
+    if (normdermethod.normdermethod == 'nonormalization'):
         value = 1.0
     elif (normdermethod.normdermethod == 'varnorm'):
         # ==>> Here it could be natural to compensate for the additional variance
@@ -925,41 +933,43 @@ and truncated at the tails with a relative approximation error less than epsilon
 
     return sum(abs(derkernel))
 
-        
-
-
-
 
 def defaultscspnormdermethodobject(
         scspnormdermethod : str ='discgaussLp',
         gamma : float = 1.0
         ) -> ScSpNormDerMethod :
+    """Converts a user-friendly string for a method for approximating 
+scale-normalized derivatives for discrete data to a class object, including 
+also a specification of the discretization method to use for discrete 
+approximation of the underlying spatial smoothing operation
+"""
     if (scspnormdermethod == 'discgauss'):
-        object = scspnormdermethodobject('discgauss', 'none', gamma)
+        object = scspnormdermethodobject('discgauss', 'nonormalization', gamma)
     elif (scspnormdermethod == 'discgaussvar'):
         object = scspnormdermethodobject('discgauss', 'varnorm', gamma)
     elif (scspnormdermethod == 'discgaussLp'):
         object = scspnormdermethodobject('discgauss', 'Lpnorm', gamma)
     elif (scspnormdermethod == 'samplgauss'):
-        object = scspnormdermethodobject('samplgauss', 'none', gamma)
+        object = scspnormdermethodobject('samplgauss', 'nonormalization', gamma)
     elif (scspnormdermethod == 'samplgaussvar'):
         object = scspnormdermethodobject('samplgauss', 'varnorm', gamma)
     elif (scspnormdermethod == 'samplgaussLp'):
         object = scspnormdermethodobject('samplgauss', 'Lpnorm', gamma)
     elif (scspnormdermethod == 'intgauss'):
-        object = scspnormdermethodobject('intgauss', 'none', gamma)
+        object = scspnormdermethodobject('intgauss', 'nonormalization', gamma)
     elif (scspnormdermethod == 'intgaussvar'):
         object = scspnormdermethodobject('intgauss', 'varnorm', gamma)
     elif (scspnormdermethod == 'intgaussLp'):
         object = scspnormdermethodobject('intgauss', 'Lpnorm', gamma)
     elif (scspnormdermethod == 'linintgauss'):
-        object = scspnormdermethodobject('linintgauss', 'none', gamma)
+        object = scspnormdermethodobject('linintgauss', 'nonormalization', gamma)
     elif (scspnormdermethod == 'linintgaussvar'):
         object = scspnormdermethodobject('linintgauss', 'varnorm', gamma)
     elif (scspnormdermethod == 'linintgaussLp'):
         object = scspnormdermethodobject('linintgauss', 'Lpnorm', gamma)
     else:
-        raise ValueError('Scale-space derivative method %s not implemented yet', scspnormdermethod)
+        raise ValueError('Scale-space derivative method %s not implemented yet',
+                             scspnormdermethod)
     return object
 
 
@@ -1018,8 +1028,9 @@ def filtermean(filter : np.ndarray) -> (float, float) :
     return xmean, ymean
 
 
-def RGB2LUV(inpic : np.ndarray) -> np.ndarray:
-    """Converts an RGB to a colour-opponent LUV colour space"""
+def RGB2LUV(inpic) -> np.ndarray:
+    """Converts an RGB colour image to a colour-opponent LUV colour space"""
+    inpic = np.array(inpic)
     outpic = np.zeros(inpic.shape)
     outpic[:, :, 1] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
     outpic[:, :, 2] = 1.0*(inpic[:, :, 0] - inpic[:, :, 1])
@@ -1027,8 +1038,9 @@ def RGB2LUV(inpic : np.ndarray) -> np.ndarray:
     return(outpic)
 
 
-def RGB2L(inpic : np.ndarray) -> np.ndarray:
-    """Converts an RGB to a greylevel colour space"""
+def RGB2L(inpic) -> np.ndarray:
+    """Converts an RGB colour image to a greylevel image"""
+    inpic = np.array(inpic)
     return((inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0)
 
 
