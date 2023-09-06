@@ -56,7 +56,7 @@ by separable filtering, using either of the methods:
   'linintgauss' - the linearily integrated Gaussian kernel
 
 The discrete analogue of the Gaussian kernel has the best theoretical properties 
-of these kerne, in the sense that it obeys both (i) non-enhancement of local 
+of these kernels, in the sense that it obeys both (i) non-enhancement of local 
 extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
 any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
 are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
