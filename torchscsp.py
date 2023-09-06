@@ -2,7 +2,7 @@
 
 import numpy as np
 import math
-from math import pi
+from math import pi, ceil
 import torch
 
 from pyscsp.discscsp import gaussfiltsize
@@ -36,8 +36,59 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 3(4): 349-376.
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+
+Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
+networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 """
-def make1Dgaussfilter(sigma, scspmethod='samplgauss', epsilon=0.01, D=1):
+
+
+def make1Dgaussfilter(
+        sigma : float,
+        scspmethod : str = 'discgauss',
+        epsilon : float = 0.01,
+        D : int = 1=1) -> torch.Tensor:
+    """Generates a mask for discrete approximation of the Gaussian kernel 
+by separable filtering, using either of the methods:
+
+  'discgauss' - the discrete analogue of the Gaussian kernel
+  'samplgauss' - the sampled Gaussian kernel
+  'intgauss' - the integrated Gaussian kernel
+  'linintgauss' - the linearily integrated Gaussian kernel
+
+The discrete analogue of the Gaussian kernel has the best theoretical properties 
+of these kerne, in the sense that it obeys both (i) non-enhancement of local 
+extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
+any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
+are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
+for an infinitely sized filter. The current implementation of the this filter 
+in terms of modified Bessel functions of integer order is, however, not 
+supported in terms of existing PyTorch functions, implying that the choice 
+of this method will not allow for scale adaptation by backprop.
+
+For this reason, the alternative methods 'samplgauss', 'intgauss' and
+'linintgauss' are provided, with full implementations in terms of PyTorch
+functions and thereby supporting scale adaptation by backprop.
+
+For these methods, there are the possible advantages (+) and disadvantages (-):
+
+  'samplgauss' + no scale offset in the spatial discretization
+               - the kernel values may become greater than 1 for small values of sigma
+               - the kernel values do not sum up to one
+
+  'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+             + the kernel values are guaranteed to sum up to one over an infinite domain
+             - the box integration introduces a scale offset of 1/12
+
+  'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+                - the triangular window integration introduces a scale offset of 1/6
+            
+References:
+
+Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+
+Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+"""
     if (scspmethod == 'samplgauss'):
         return make1Dsamplgaussfilter(sigma, epsilon, D)
     elif (scspmethod == 'discgauss'):
@@ -53,7 +104,7 @@ def make1Dgaussfilter(sigma, scspmethod='samplgauss', epsilon=0.01, D=1):
  
     
 def make1Dsamplgaussfilter(sigma, epsilon=0.01, D=1):
-    vecsize = int((np.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
+    vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     return gauss(x, sigma)
 
@@ -65,7 +116,7 @@ def gauss(x, sigma=1.0):
 def make1Dintgaussfilter(sigma, epsilon=0.01, D=1):
     # Box integrated Gaussian kernel over each pixel support region
     # Remark: Adds additional spatial variance 1/12 to the kernel
-    vecsize = int((np.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
+    vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     return scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
 
@@ -77,7 +128,7 @@ def scaled_erf(z, sigma=1.0):
 def make1Dlinintgaussfilter(sigma, epsilon=0.01, D=1):
     # Linearly integrated Gaussian kernel over each extended pixel support region 
     # Remark: Adds additional spatial variance 1/6 to the kernel
-    vecsize = int((np.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
+    vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     # The following equation is the result of a closed form integration of the expression
     # for the filter coefficients in Eq (2.89) on page 52 in Lindeberg's PhD thesis from 1991
@@ -90,7 +141,14 @@ def x_scaled_erf(x, sigma=1.0):
 
 
 def jet2mask(C0=0.0, Cx=0.0, Cy=0.0, Cxx=0.0, Cxy=0.0, Cyy=0.0, sigma=1.0):
-    # Only variance-based normalization so far
+    """Returns a discrete mask for a Gaussian derivative layer according to
+
+Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
+networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
+
+using variance-based normalization of the Gaussian derivative operators 
+scale normalization parameter gamma = 1
+"""
     return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
 
 

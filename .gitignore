@@ -1,0 +1,28 @@
+# mac
+.DS_Store
+
+# Distribution/Packaging
+.env
+.venv
+env/
+venv/
+wheels/
+*.egg
+.ruff_cache
+
+# Mercurial
+.hg/
+
+# IDEs
+.idea
+.vs/
+.vscode/
+.spyderproject
+.spyproject
+.ipynb_checkpoints
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+**/*.pyc
+
