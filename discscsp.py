@@ -3,7 +3,7 @@ from scipy.ndimage import correlate1d, correlate
 from scipy.special import ive
 from math import sqrt, exp, pi
 from scipy.special import erf, erfcinv
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 
 """Discrete Scale Space and Scale-Space Derivative Toolbox for Python
@@ -38,6 +38,9 @@ International Journal of Computer Vision, vol 30(2): 77-116.
 Lindeberg (1998) "Edge detection and ridge detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 117-154.
 
+Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer 
+Science and Engineering, John Wiley & Sons, 2009, s. 2495-2504.
+
 Compared to the original Matlab code, the following implementation is reduced in the following ways:
 - there is no handling of scale normalization powers gamma that are not equal to one
 - Lp-normalization is only implemented for p = 1
@@ -46,14 +49,37 @@ Compared to the original Matlab code, the following implementation is reduced in
 - this reimplementation has not yet been thoroughly tested
 """
 
-# Note! The arguments scspmethod and normdermethod, which may be either strings
-# or objects are not typed. 
+
+class ScSpMethod(NamedTuple):
+    methodname: str # either 'discgauss', 'samplgauss', 'intgauss' or 'linintgauss'
+    epsilon: float
+
+    
+def discgaussmethod(epsilon : float) -> ScSpMethod :
+    return ScSpMethod('discgauss', epsilon)
+
+
+class ScSpNormDerMethod(NamedTuple):
+    scspmethod: ScSpMethod
+    normdermethod: str # either 'none', 'varnorm' or 'Lpnorm'
+    gamma: float
+
+
+def scspnormdermethodobject(
+        scspmethod : str = 'discgauss',
+        normdermethod : str = 'Lpnorm',
+        gamma : float = 1.0,
+        epsilon : float = 0.00000001
+        ) -> ScSpNormDerMethod :
+    return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod, gamma)
+
 
 def scspconv(
         inpic,
         sigma : float,
-        scspmethod = 'discgauss',
-        epsilon : float = 0.00000001) -> np.ndarray :
+        scspmethod : Union[str, ScSpMethod] = 'discgauss',
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
     """Computes the scale-space representation of the 2-D image inpic (or a 1-D signal) 
 at scale level sigma in units of the standard deviation of the Gaussian kernel that 
 is approximated discretely with the method scspmethod and with the formally infinite 
@@ -92,7 +118,8 @@ having the attributes scspmethod.methodname and scspmethod.epsilon.
 def discgaussconv(
         inpic,
         sigma : float,
-        epsilon : float = 0.00000001) -> np.ndarray:
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the discrete analogue of 
 the Gaussian kernel with standard deviation sigma and relative truncation error 
 less than epsilon.
@@ -128,8 +155,8 @@ Pattern Analysis and Machine Intelligence, 12(3): 234--254.
     elif (ndim == 3):
         # Treat as multilayer image
         outpic = np.zeros(inpic.shape)
-        for l in range(0, inpic.shape[2]):
-            outpic[:, :, l] = discgaussconv(inpic[:, :, l], sigma, epsilon)
+        for layer in range(0, inpic.shape[2]):
+            outpic[:, :, layer] = discgaussconv(inpic[:, :, layer], sigma, epsilon)
     else:
         raise ValueError('Cannot handle images of dimensionality %d' % ndim)
     
@@ -139,7 +166,8 @@ Pattern Analysis and Machine Intelligence, 12(3): 234--254.
 def make1Ddiscgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
-        D : int = 1) -> np.ndarray :
+        D : int = 1
+        ) -> np.ndarray :
     """Generates a 1-D discrete analogue of the Gaussian kernel at scale level sigma
 in units of the standard deviation of the kernel and with relative truncation error
 not exceeding epsilon as a relative number over a D-dimensional spatial domain.
@@ -156,7 +184,8 @@ not exceeding epsilon as a relative number over a D-dimensional spatial domain.
 def samplgaussconv(
         inpic,
         sigma : float,
-        epsilon : float = 0.00000001) -> np.ndarray:
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the sampled Gaussian 
 kernel with standard deviation sigma and relative truncation error less than epsilon.
 
@@ -189,8 +218,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     elif (ndim == 3):
         # Treat as multilayer image
         outpic = np.zeros(inpic.shape)
-        for l in range(0, inpic.shape[2]):
-            outpic[:, :, l] = samplgaussconv(inpic[:, :, l], sigma, epsilon)
+        for layer in range(0, inpic.shape[2]):
+            outpic[:, :, layer] = samplgaussconv(inpic[:, :, layer], sigma, epsilon)
     else:
         raise ValueError('Cannot handle images of dimensionality %d' % ndim)
     
@@ -200,7 +229,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 def make1Dsamplgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
-        D : int = 1) -> np.ndarray :
+        D : int = 1
+        ) -> np.ndarray :
     """Generates a sampled Gaussian kernel with standard deviation sigma, given an
 upper bound on the relative truncation error epsilon over a D-dimensional domain.
 """
@@ -216,7 +246,8 @@ def gauss(x : np.ndarray, sigma : float = 1.0) -> np.ndarray :
 def intgaussconv(
         inpic,
         sigma : float,
-        epsilon : float = 0.00000001) -> np.ndarray :
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the integrated Gaussian 
 kernel with standard deviation sigma and relative truncation error less than epsilon.
 
@@ -247,8 +278,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     elif (ndim == 3):
         # Treat as multilayer image
         outpic = np.zeros(inpic.shape)
-        for l in range(0, inpic.shape[2]):
-            outpic[:, :, l] = intgaussconv(inpic[:, :, l], sigma, epsilon)
+        for layer in range(0, inpic.shape[2]):
+            outpic[:, :, layer] = intgaussconv(inpic[:, :, layer], sigma, epsilon)
     else:
         raise ValueError('Cannot handle images of dimensionality %d' % ndim)
     
@@ -258,7 +289,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 def make1Dintgaussfilter(
     sigma : float,
     epsilon : float = 0.00000001,
-    D : int = 1) -> np.ndarray :
+    D : int = 1
+    ) -> np.ndarray :
     """Generates an integrated Gaussian kernel with standard deviation sigma, given an
 upper bound on the relative truncation error epsilon over a D-dimensional domain.
 
@@ -273,7 +305,11 @@ def scaled_erf(x : np.ndarray, sigma : float = 1.0) -> np.ndarray :
     return 1/2*(1 + erf(x/(sqrt(2)*sigma)))
 
 
-def linintgaussconv(inpic, sigma, epsilon=0.00000001):
+def linintgaussconv(
+        inpic,
+        sigma : float,
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the linerily integrated Gaussian 
 kernel with standard deviation sigma and relative truncation error less than epsilon.
 
@@ -303,8 +339,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     elif (ndim == 3):
         # Treat as multilayer image
         outpic = np.zeros(inpic.shape)
-        for l in range(0, inpic.shape[2]):
-            outpic[:, :, l] = linintgaussconv(inpic[:, :, l], sigma, epsilon)
+        for layer in range(0, inpic.shape[2]):
+            outpic[:, :, layer] = linintgaussconv(inpic[:, :, layer], sigma, epsilon)
     else:
         raise ValueError('Cannot handle images of dimensionality %d' % ndim)
     
@@ -314,7 +350,8 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 def make1Dlinintgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
-        D : int = 1) -> np.ndarray:
+        D : int = 1
+        ) -> np.ndarray :
     """Generates a linearily integrated Gaussian kernel with standard deviation sigma, given 
 an upper bound on the relative truncation error epsilon over a D-dimensional domain.
 
@@ -333,7 +370,7 @@ def x_scaled_erf(x : np.ndarray, sigma : float = 1.0):
     return x * scaled_erf(x, sigma)
 
 
-def gaussfiltsize(sigma : float, epsND : float, D : int) -> float:
+def gaussfiltsize(sigma : float, epsND : float, D : int) -> float :
     """Estimates the necessary size to truncate a Gaussian kernel with standard deviation
 sigma to a relative truncation epsND over a D-dimensional domain.
 """
@@ -478,7 +515,8 @@ def computeNjetfcn(
         inpic,
         njetfcn : str,
         sigma : float,
-        normdermethod = 'discgaussLp') -> np.ndarray :
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
+        ) -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
 of the image inpic at scale level sigma in units of the standard deviation of
 the Gaussian kernel, and using the scale normalization method normdermethod.
@@ -495,6 +533,7 @@ Implemented N-jet functions:
   'Laplace' - Laplacian operator
   'detHessian' - determinant of the Hessian
   'sqrtdetHessian' - signed square root of absolute value of determinant of the Hessian
+  'Kappa' - rescaled level curve curvature
   'Lv2Lvv' - 2:nd-order directional derivative in gradient direction * Lv^2
   'Lv3Lvvv' - 3:rd-order directional derivative in gradient direction * Lv^3
   'Lp' - 1:st-order directional derivative in 1:st principal curvature direction
@@ -502,6 +541,12 @@ Implemented N-jet functions:
   'Lpp' - 2:nd-order directional derivative in 1:st principal curvature direction
   'Lqq' - 2:nd-order directional derivative in 2:nd principal curvature direction
 In addition, 3:rd- and 4:th-order partial derivatives are also implemented.
+
+The differential expressions 'Lv', 'Lv2', 'Lv2Lvv' and 'Lv3Lvvv' are used in
+methods for edge detection. The differential expressions 'Laplace', 'detHessian'
+and 'sqrtdetHessian' are used in methods for interest point detection, 
+blob detection and corner detection. The differential expressions 'Lp', 'Lq',
+'Lpp' and 'Lqq' are used in methods for ridge detection.
 
 This function is the preferred choice for simplicitly or if you only need a single 
 N-jetfcn at the given scale. If you instead want to compute multiple N-jetfcns
@@ -520,7 +565,8 @@ def applyNjetfcn(
         smoothpic,
         njetfcn : str,
         sigma : float = 1.0,
-        normdermethod = 'discgaussLp') -> np.ndarray :
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
+        ) -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
 to an already computed scale-space representation at scale level sigma in units
 of the standard deviation of the Gaussian kernel, and using the scale normalization
@@ -538,12 +584,19 @@ Implemented N-jet functions:
   'Laplace' - Laplacian operator
   'detHessian' - determinant of the Hessian
   'sqrtdetHessian' - signed square root of absolute value of determinant of the Hessian
+  'Kappa' - rescaled level curve curvature
   'Lv2Lvv' - 2:nd-order directional derivative in gradient direction * Lv^2
   'Lv3Lvvv' - 3:rd-order directional derivative in gradient direction * Lv^3
   'Lp' - 1:st-order directional derivative in 1:st principal curvature direction
   'Lq' - 1:st-order directional derivative in 2:nd principal curvature direction
   'Lpp' - 2:nd-order directional derivative in 1:st principal curvature direction
   'Lqq' - 2:nd-order directional derivative in 2:nd principal curvature direction
+
+The differential expressions 'Lv', 'Lv2', 'Lv2Lvv' and 'Lv3Lvvv' are used in
+methods for edge detection. The differential expressions 'Laplace', 'detHessian'
+and 'sqrtdetHessian' are used in methods for interest point detection, 
+blob detection and corner detection. The differential expressions 'Lp', 'Lq',
+'Lpp' and 'Lqq' are used in methods for ridge detection.
 """
     if (isinstance(normdermethod, str)):
         normdermethod = defaultscspnormdermethodobject(normdermethod)
@@ -551,8 +604,9 @@ Implemented N-jet functions:
     if ((smoothpic.ndim == 3) and (smoothpic.shape[2] > 1)):
         numlayers = smoothpic.shape[2]
         outpic = np.zeros(smoothpic.shape)
-        for l in range(0, numlayers):
-            outpic[:, :, l] = applyNjetfcn(smoothpic[:, :, l], njetfcn, sigma, normdermethod)
+        for layer in range(0, numlayers):
+            outpic[:, :, layer] = \
+              applyNjetfcn(smoothpic[:, :, layer], njetfcn, sigma, normdermethod)
     else:
         if (njetfcn == 'L'):
             outpic = smoothpic
@@ -589,6 +643,14 @@ Implemented N-jet functions:
             Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
             detHessian = Lxx*Lyy - Lxy*Lxy
             outpic = np.sign(detHessian) * np.sqrt(np.abs(detHessian))
+        elif (njetfcn == 'Kappa'):
+            # Rescaled level curve curvature
+            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            outpic = Ly*Ly*Lxx + Lx*Lx*Lyy - 2*Lx*Ly*Lxy
         elif (njetfcn == 'Lv2Lvv'):
             # 2nd-order derivative in gradient direction (used for edge detection)
             Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
@@ -731,7 +793,8 @@ method normdermethod.
 def normgaussder1D_L1norm(
         order : int,
         sigma : float,
-        gammapar : float = 1.0) -> float :
+        gammapar : float = 1.0
+        ) -> float :
     """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative of order sigma
 and at scale sigma in units of the standard deviation of the Gaussian kernel, using
 the scale normalization parameter gammapar.
@@ -785,7 +848,8 @@ truncated at the tails with a relative approximation error less than epsilon.
 def samplgaussder1D_L1norm(
         order : int,
         sigma : float,
-        epsilon : float = 0.00000001) -> float :
+        epsilon : float = 0.00000001
+        ) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
 Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -811,7 +875,8 @@ truncated at the tails with a relative approximation error less than epsilon.
 def intgaussder1D_L1norm(
         order : int,
         sigma : float,
-        epsilon : float = 0.00000001) -> float :
+        epsilon : float = 0.00000001
+        ) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D integrated 
 Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -837,7 +902,8 @@ truncated at the tails with a relative approximation error less than epsilon.
 def linintgaussder1D_L1norm(
         order : int,
         sigma : float,
-        epsilon : float = 0.00000001) -> float :
+        epsilon : float = 0.00000001
+        ) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D linearly 
 integrated Gaussian kernel at scale level sigma in units of the standard deviation 
 and truncated at the tails with a relative approximation error less than epsilon.
@@ -860,32 +926,14 @@ and truncated at the tails with a relative approximation error less than epsilon
     return sum(abs(derkernel))
 
         
-class ScSpMethod(NamedTuple):
-    methodname: str # either 'discgauss', 'samplgauss', 'intgauss' or 'linintgauss'
-    epsilon: float
 
 
-def discgaussmethod(epsilon : float) -> ScSpMethod :
-    return ScSpMethod('discgauss', epsilon)
-
-
-class ScSpNormDerMethod(NamedTuple):
-    scspmethod: ScSpMethod
-    normdermethod: str # either 'none', 'varnorm' or 'Lpnorm'
-    gamma: float
-
-
-def scspnormdermethodobject(
-        scspmethod : str = 'discgauss',
-        normdermethod : str = 'Lpnorm',
-        gamma : float = 1.0,
-        epsilon : float = 0.00000001) -> ScSpNormDerMethod :
-    return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod, gamma)
 
 
 def defaultscspnormdermethodobject(
         scspnormdermethod : str ='discgaussLp',
-        gamma : float = 1.0) -> ScSpNormDerMethod :
+        gamma : float = 1.0
+        ) -> ScSpNormDerMethod :
     if (scspnormdermethod == 'discgauss'):
         object = scspnormdermethodobject('discgauss', 'none', gamma)
     elif (scspnormdermethod == 'discgaussvar'):
@@ -969,6 +1017,20 @@ def filtermean(filter : np.ndarray) -> (float, float) :
     
     return xmean, ymean
 
-    
+
+def RGB2LUV(inpic : np.ndarray) -> np.ndarray:
+    """Converts an RGB to a colour-opponent LUV colour space"""
+    outpic = np.zeros(inpic.shape)
+    outpic[:, :, 1] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
+    outpic[:, :, 2] = 1.0*(inpic[:, :, 0] - inpic[:, :, 1])
+    outpic[:, :, 3] = (inpic[:, :, 0] + inpic[:, :, 1])/2.0 - inpic[:, :, 2]
+    return(outpic)
+
+
+def RGB2L(inpic : np.ndarray) -> np.ndarray:
+    """Converts an RGB to a greylevel colour space"""
+    return((inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0)
+
+
 if __name__ == '__main__': 
     main() 
