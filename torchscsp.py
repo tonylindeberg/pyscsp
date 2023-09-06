@@ -46,7 +46,7 @@ def make1Dgaussfilter(
         sigma : float,
         scspmethod : str = 'discgauss',
         epsilon : float = 0.01,
-        D : int = 1=1) -> torch.Tensor:
+        D : int = 1) -> torch.Tensor:
     """Generates a mask for discrete approximation of the Gaussian kernel 
 by separable filtering, using either of the methods:
 
