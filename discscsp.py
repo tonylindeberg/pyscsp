@@ -101,7 +101,7 @@ for an infinitely sized filter.
 
 In summary, the different methods have the possible advantages (+) and disadvantages (-):
 
-  'discgauss' + guarantees non-enhancement of extrema over a 2-D image domain
+  'discgauss' + guarantees non-enhancement of local extrema over a 2-D image domain
               + guarantees non-creation of new extrema from any finer to any
                 coarser level of scale over a 1-D signal domain
               + the kernel values are guaranteed to be in the interval [0, 1]
