@@ -76,13 +76,13 @@ For these methods, there are the possible advantages (+) and disadvantages (-):
   'samplgauss' + no added scale offset in the spatial discretization
                - the kernel values may become greater than 1 for small values of sigma
                - the kernel values do not sum up to one
-               - for very small values of sigma the kernel has a too narrow shape
+               - for very small values of sigma the kernels have too narrow shape
 
   'normsamplgauss' + no added scale offset in the spatial discretization
                    + formally the kernel values are guaranteed to be in the interval [0, 1]
                    + formally the kernel values are guaranteed to sum up to 1 
                    - the complementary normalization of the kernel is ad hoc
-                   - for very small values of sigma the kernel has a too narrow shape
+                   - for very small values of sigma the kernels have too narrow shape
 
   'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
              + the kernel values are guaranteed to sum up to 1 over an infinite domain
