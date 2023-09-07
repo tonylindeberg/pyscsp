@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import correlate1d, correlate
 from scipy.special import ive
-from math import sqrt, exp, pi
+from math import sqrt, exp, ceil, pi
 from scipy.special import erf, erfcinv
 from typing import NamedTuple, Union
 
@@ -233,7 +233,7 @@ in units of the standard deviation of the kernel and with relative truncation er
 not exceeding epsilon as a relative number over a D-dimensional spatial domain.
 """
     s = sigma*sigma
-    tmpvecsize = np.ceil(1 + 1.5*gaussfiltsize(sigma, epsilon, D))
+    tmpvecsize = ceil(1 + 1.5*gaussfiltsize(sigma, epsilon, D))
     # Generate filter coefficients from modified Bessel functions
     longhalffiltvec = ive(np.arange(0, tmpvecsize+1), s)
     halffiltvec = truncfilter(longhalffiltvec, truncerrtransf(epsilon, D))
@@ -294,7 +294,7 @@ def make1Dsamplgaussfilter(
     """Generates a sampled Gaussian kernel with standard deviation sigma, given an
 upper bound on the relative truncation error epsilon over a D-dimensional domain.
 """
-    vecsize = np.ceil(1.1*gaussfiltsize(sigma, epsilon, D))
+    vecsize = ceil(1.1*gaussfiltsize(sigma, epsilon, D))
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
     return gauss(x, sigma)
 
@@ -358,7 +358,7 @@ upper bound on the relative truncation error epsilon over a D-dimensional domain
 
 Remark: Adds additional spatial variance 1/12 to the kernel
 """
-    vecsize = np.ceil(1.1*gaussfiltsize(sigma, epsilon, D))
+    vecsize = ceil(1.1*gaussfiltsize(sigma, epsilon, D))
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
     return scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
 
@@ -425,7 +425,7 @@ an upper bound on the relative truncation error epsilon over a D-dimensional dom
 
 Remark: Adds additional spatial variance 1/6 to the kernel
 """
-    vecsize = np.ceil(1.1*gaussfiltsize(sigma, epsilon, D))
+    vecsize = ceil(1.1*gaussfiltsize(sigma, epsilon, D))
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
     # The following equation is the result of a closed form integration of the expression
     # for the filter coefficients in Eq (3.90) in Lindeberg (1993)
