@@ -52,7 +52,7 @@ Compared to the original Matlab code, the following implementation is reduced in
 
 # Object for storing the parameters of a scale-space discretization method
 class ScSpMethod(NamedTuple):
-    methodname: str # either 'discgauss', 'samplgauss', 'intgauss' or 'linintgauss'
+    methodname: str # either 'discgauss', 'samplgauss', 'normsamplgauss', 'intgauss' or 'linintgauss'
     epsilon: float
 
     
@@ -89,6 +89,7 @@ less than epsilon.
 The following discrete approximation methods have been implemented:
   'discgauss' - the discrete analogue of the Gaussian kernel
   'samplgauss' - the sampled Gaussian kernel
+  'normsamplgauss' - the normalized sampled Gaussian kernel
   'intgauss' - the integrated Gaussian kernel
   'linintgauss' - the linearily interpolated and integrated Gaussian kernel
 
@@ -97,7 +98,8 @@ of these kernels, in the sense that it obeys both (i) non-enhancement of local
 extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
 any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
 are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
-for an infinitely sized filter.
+for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
+kernel is also equal to the sigma value.
 
 In summary, the different methods have the possible advantages (+) and disadvantages (-):
 
@@ -105,15 +107,22 @@ In summary, the different methods have the possible advantages (+) and disadvant
               + guarantees non-creation of new extrema from any finer to any
                 coarser level of scale over a 1-D signal domain
               + the kernel values are guaranteed to be in the interval [0, 1]
-              + the kernel values are guaranteed to be in the interval [0, 1]
+              + the kernel values are guaranteed to sum to 1 over an infinite domain
               + no scale offset in the spatial discretization
 
   'samplgauss' + no scale offset in the spatial discretization
                - the kernel values may become greater than 1 for small values of sigma
                - the kernel values do not sum up to one
+               - for very small values of sigma the kernel has a too narrow shape
+
+  'normsamplgauss' + no scale offset in the spatial discretization
+                   + formally the kernel values are guaranteed to be in the interval [0, 1]
+                   + formally the kernel values are guaranteed to sum up to 1 
+                   - the complementary normalization of the kernel is ad hoc
+                   - for very small values of sigma the kernel has a too narrow shape
 
   'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
-             + the kernel values are guaranteed to sum up to one over an infinite domain
+             + the kernel values are guaranteed to sum up to 1 over an infinite domain
              - the box integration introduces a scale offset of 1/12
 
   'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
@@ -121,6 +130,9 @@ In summary, the different methods have the possible advantages (+) and disadvant
 
 Besides being a string, the argument scspmethod may also be an object
 having the attributes scspmethod.methodname and scspmethod.epsilon.
+
+The parameter epsilon specifies an upper bound on the relative truncation error
+for separable filtering over a D-dimensional domain.
 """
     if (isinstance(scspmethod, str)):
         scspmethodname = scspmethod
@@ -132,6 +144,8 @@ having the attributes scspmethod.methodname and scspmethod.epsilon.
         outpic = discgaussconv(inpic, sigma, epsilon)
     elif (scspmethodname == 'samplgauss'):
         outpic = samplgaussconv(inpic, sigma, epsilon)
+    elif (scspmethodname == 'normsamplgauss'):
+        outpic = normsamplgaussconv(inpic, sigma, epsilon)
     elif (scspmethodname == 'intgauss'):
         outpic = intgaussconv(inpic, sigma, epsilon)        
     elif (scspmethodname == 'linintgauss'):
@@ -164,6 +178,8 @@ methods 'intgauss' and 'linintgauss'.
     if (scspmethodname == 'discgauss'):
         scaleoffset = 0.0
     elif (scspmethodname == 'samplgauss'):
+        scaleoffset = 0.0
+    elif (scspmethodname == 'normsamplgauss'):
         scaleoffset = 0.0
     elif (scspmethodname == 'intgauss'):
         scaleoffset = 1/12        
@@ -301,6 +317,65 @@ upper bound on the relative truncation error epsilon over a D-dimensional domain
 
 def gauss(x : np.ndarray, sigma : float = 1.0) -> np.ndarray :
     return 1/(sqrt(2*pi)*sigma)*np.exp(-(x**2/(2*sigma**2)))
+
+
+def normsamplgaussconv(
+        inpic,
+        sigma : float,
+        epsilon : float = 0.00000001
+        ) -> np.ndarray :
+    """Convolves the 2-D image inpic (or a 1-D signal) with the normalized sampled Gaussian 
+kernel with standard deviation sigma and relative truncation error less than epsilon.
+
+The transformation from the input image will always be a scale-space transformation,
+in the sense that for a 1-D signal the number of local extrema in the smoothed
+signal are guaranteed to not exceed the number of local extrema in the input image.
+The transformation between adjacent scale levels is, however, not guaranteed to
+be a scale-space transformation.
+
+By a normalization of the discrete sampled Gaussian filter to unit l_1-norm,
+this approach avoids the problems that the regular sampled Gaussian kernel
+may assume values greater than 1 and the kernel values do not sum to 1.
+
+For a theoretical explanations of the properties of the regular sampled
+Gaussian kernel, see Section VII.A in
+
+Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+
+or Section 3.6.1 in
+
+Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+"""
+    ndim = inpic.ndim
+    sep1Dfilter = make1Dnormsamplgaussfilter(sigma, epsilon, ndim)
+
+    if (ndim == 1):
+        outpic = correlate1d(inpic, sep1Dfilter)
+    elif (ndim == 2):
+        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        outpic = correlate1d(tmppic, sep1Dfilter, 1)
+    elif (ndim == 3):
+        # Treat as multilayer image
+        outpic = np.zeros(inpic.shape)
+        for layer in range(0, inpic.shape[2]):
+            outpic[:, :, layer] = normsamplgaussconv(inpic[:, :, layer], sigma, epsilon)
+    else:
+        raise ValueError('Cannot handle images of dimensionality %d' % ndim)
+    
+    return outpic
+
+
+def make1Dnormsamplgaussfilter(
+        sigma : float,
+        epsilon : float = 0.00000001,
+        D : int = 1
+        ) -> np.ndarray :
+    """Generates a normalized sampled Gaussian kernel with standard deviation sigma, 
+given an upper bound on the relative truncation error epsilon over a D-dimensional domain.
+"""
+    prelfilter = make1Dsamplgaussfilter(sigma, epsilon, D)
+    return prelfilter/np.sum(prelfilter)
 
 
 def intgaussconv(
@@ -831,6 +906,15 @@ method normdermethod.
                 samplgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
             else:
                 raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+        elif (normdermethod.scspmethod.methodname == 'normsamplgauss'):
+            if (normdermethod.gamma == 1.0):
+                value = \
+                (normgaussder1D_L1norm(xorder, sigma) * \
+                normgaussder1D_L1norm(yorder, sigma)) / \
+                (normsamplgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
+                 normsamplgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+            else:
+                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
         elif (normdermethod.scspmethod.methodname == 'intgauss'):
             if (normdermethod.gamma == 1.0):
                 value = \
@@ -940,6 +1024,33 @@ truncated at the tails with a relative approximation error less than epsilon.
     return sum(abs(derkernel))
 
 
+def normsamplgaussder1D_L1norm(
+        order : int,
+        sigma : float,
+        epsilon : float = 0.00000001
+        ) -> float :
+    """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
+Gaussian kernel at scale level sigma in units of the standard deviation and 
+truncated at the tails with a relative approximation error less than epsilon.
+"""
+    smoothkernel = make1Dnormsamplgaussfilter(sigma, epsilon, 1)
+
+    if (order == 0):
+        derkernel = smoothkernel
+    elif (order == 1):
+        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
+    elif (order == 2):
+        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
+    elif (order == 3):
+        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
+    elif (order == 4):
+        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
+    else:
+        raise ValueError('Not implemented for order %d yet' % order)
+
+    return sum(abs(derkernel))
+
+
 def intgaussder1D_L1norm(
         order : int,
         sigma : float,
@@ -1015,6 +1126,12 @@ approximation of the underlying spatial smoothing operation
         object = scspnormdermethodobject('samplgauss', 'varnorm', gamma)
     elif (scspnormdermethod == 'samplgaussLp'):
         object = scspnormdermethodobject('samplgauss', 'Lpnorm', gamma)
+    elif (scspnormdermethod == 'normsamplgauss'):
+        object = scspnormdermethodobject('normsamplgauss', 'nonormalization', gamma)
+    elif (scspnormdermethod == 'normsamplgaussvar'):
+        object = scspnormdermethodobject('normsamplgauss', 'varnorm', gamma)
+    elif (scspnormdermethod == 'normsamplgaussLp'):
+        object = scspnormdermethodobject('normsamplgauss', 'Lpnorm', gamma)
     elif (scspnormdermethod == 'intgauss'):
         object = scspnormdermethodobject('intgauss', 'nonormalization', gamma)
     elif (scspnormdermethod == 'intgaussvar'):
