@@ -92,6 +92,33 @@ The following discrete approximation methods have been implemented:
   'intgauss' - the integrated Gaussian kernel
   'linintgauss' - the linearily interpolated and integrated Gaussian kernel
 
+The discrete analogue of the Gaussian kernel has the best theoretical properties 
+of these kernels, in the sense that it obeys both (i) non-enhancement of local 
+extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
+any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
+are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
+for an infinitely sized filter.
+
+In summary, the different methods have the possible advantages (+) and disadvantages (-):
+
+  'discgauss' + guarantees non-enhancement of extrema over a 2-D image domain
+              + guarantees non-creation of new extrema from any finer to any
+                coarser level of scale over a 1-D signal domain
+              + the kernel values are guaranteed to be in the interval [0, 1]
+              + the kernel values are guaranteed to be in the interval [0, 1]
+              + no scale offset in the spatial discretization
+
+  'samplgauss' + no scale offset in the spatial discretization
+               - the kernel values may become greater than 1 for small values of sigma
+               - the kernel values do not sum up to one
+
+  'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+             + the kernel values are guaranteed to sum up to one over an infinite domain
+             - the box integration introduces a scale offset of 1/12
+
+  'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+                - the triangular window integration introduces a scale offset of 1/6
+
 Besides being a string, the argument scspmethod may also be an object
 having the attributes scspmethod.methodname and scspmethod.epsilon.
 """
