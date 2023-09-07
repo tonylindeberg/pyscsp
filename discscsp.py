@@ -32,14 +32,14 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
-Lindeberg (1998) "Feature detection with automatic scale selection", 
+Lindeberg (1998a) "Feature detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 77-116.
 
-Lindeberg (1998) "Edge detection and ridge detection with automatic scale selection", 
+Lindeberg (1998b) "Edge detection and ridge detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 117-154.
 
 Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer 
-Science and Engineering, John Wiley & Sons, 2009, s. 2495-2504.
+Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 
 Compared to the original Matlab code, the following implementation is reduced in the following ways:
 - there is no handling of scale normalization powers gamma that are not equal to one
@@ -114,7 +114,40 @@ having the attributes scspmethod.methodname and scspmethod.epsilon.
 
     return outpic
 
-        
+
+def scaleoffset_variance(
+        scspmethod : Union[str, ScSpMethod] = 'discgauss'
+        ) -> float :
+    """Returns the scale offset that the scale-space discretization method
+scspmethod gives rise to.
+
+Note that this scale offset is given in units of the variance s = sigma^2
+of the kernel, as opposed to the standard deviation sigma, motivated by
+the additive property of variances under convolution of non-negative kernels.
+
+The value of this scale offset can be used in later stages to compensate
+for the non-zero scale offset implied by the scale-space discretization
+methods 'intgauss' and 'linintgauss'.
+"""
+    if (isinstance(scspmethod, str)):
+        scspmethodname = scspmethod
+    else:
+        scspmethodname = scspmethod.methodname
+
+    if (scspmethodname == 'discgauss'):
+        scaleoffset = 0.0
+    elif (scspmethodname == 'samplgauss'):
+        scaleoffset = 0.0
+    elif (scspmethodname == 'intgauss'):
+        scaleoffset = 1/12        
+    elif (scspmethodname == 'linintgauss'):
+        scaleoffset = 1/6      
+    else:
+        raise ValueError('Scale space method %s not implemented' % scspmethodname)
+
+    return scaleoffset
+
+
 def discgaussconv(
         inpic,
         sigma : float,

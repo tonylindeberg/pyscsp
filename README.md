@@ -44,14 +44,14 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
-Lindeberg (1998) "Feature detection with automatic scale selection", 
+Lindeberg (1998a) "Feature detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 77-116.
 
-Lindeberg (1998) "Edge detection and ridge detection with automatic scale selection", 
+Lindeberg (1998b) "Edge detection and ridge detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 117-154.
 
 Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer 
-Science and Engineering, John Wiley & Sons, 2009, s. 2495-2504.
+Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
