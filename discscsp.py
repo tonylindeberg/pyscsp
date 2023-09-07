@@ -108,14 +108,14 @@ In summary, the different methods have the possible advantages (+) and disadvant
                 coarser level of scale over a 1-D signal domain
               + the kernel values are guaranteed to be in the interval [0, 1]
               + the kernel values are guaranteed to sum to 1 over an infinite domain
-              + no scale offset in the spatial discretization
+              + no scale offset at all in the spatial discretization
 
-  'samplgauss' + no scale offset in the spatial discretization
+  'samplgauss' + no added scale offset in the spatial discretization
                - the kernel values may become greater than 1 for small values of sigma
                - the kernel values do not sum up to one
                - for very small values of sigma the kernel has a too narrow shape
 
-  'normsamplgauss' + no scale offset in the spatial discretization
+  'normsamplgauss' + no added scale offset in the spatial discretization
                    + formally the kernel values are guaranteed to be in the interval [0, 1]
                    + formally the kernel values are guaranteed to sum up to 1 
                    - the complementary normalization of the kernel is ad hoc
