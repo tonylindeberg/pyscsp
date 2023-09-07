@@ -53,6 +53,7 @@ by separable filtering, using either of the methods:
 
   'discgauss' - the discrete analogue of the Gaussian kernel
   'samplgauss' - the sampled Gaussian kernel
+  'normsamplgauss' - the sampled Gaussian kernel
   'intgauss' - the integrated Gaussian kernel
   'linintgauss' - the linearily integrated Gaussian kernel
 
