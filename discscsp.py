@@ -556,7 +556,8 @@ def mirrorhfilter(halffilter : np.ndarray) -> np.ndarray :
 
 
 def deltafcn(xsize : int, ysize : int) -> np.ndarray :
-    """Generates a discrete delta function of size xsize x ysize pixels."""
+    """Generates a discrete delta function of size xsize x ysize pixels.
+"""
     pic = np.zeros([xsize, ysize])
 
     if (xsize % 2):
@@ -1182,7 +1183,8 @@ def variance(filter : np.ndarray) -> np.ndarray:
 
 
 def filtermean(filter : np.ndarray) -> (float, float) :
-    """Returns the spatial mean vector of 2-D filter, assumed to be non-negative."""
+    """Returns the spatial mean vector of 2-D filter, assumed to be non-negative.
+"""
     if (filter.ndim != 2):
         raise ValueError('Only implemented for 2-D filters so far')
 
@@ -1207,7 +1209,8 @@ def filtermean(filter : np.ndarray) -> (float, float) :
 
 
 def mean1D(filter : np.ndarray) -> float:
-    """Computes the spatial mean of a non-negative filter."""
+    """Computes the spatial mean of a non-negative filter.
+"""
     
     if filter.ndim != 1:
         raise ValueError('Only implemented for 1-D filters')
@@ -1219,7 +1222,8 @@ def mean1D(filter : np.ndarray) -> float:
 
 
 def variance1D(filter : np.ndarray) -> float:
-    """Computes the spatial variance of a non-negative filter."""
+    """Computes the spatial variance of a non-negative filter.
+"""
     
     if filter.ndim != 1:
         raise ValueError('Only implemented for 1-D filters')
@@ -1234,7 +1238,8 @@ def variance1D(filter : np.ndarray) -> float:
 
 
 def RGB2LUV(inpic) -> np.ndarray:
-    """Converts an RGB colour image to a colour-opponent LUV colour space"""
+    """Converts an RGB colour image to a colour-opponent LUV colour space.
+"""
     inpic = np.array(inpic)
     outpic = np.zeros(inpic.shape)
     outpic[:, :, 1] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
@@ -1244,7 +1249,8 @@ def RGB2LUV(inpic) -> np.ndarray:
 
 
 def RGB2L(inpic) -> np.ndarray:
-    """Converts an RGB colour image to a greylevel image"""
+    """Converts an RGB colour image to a greylevel image
+"""
     inpic = np.array(inpic)
     return((inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0)
 

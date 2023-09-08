@@ -1,4 +1,5 @@
-"""Extensions of parts of the discscsp package to PyTorch networks"""
+"""Extensions of parts of the discscsp package to PyTorch networks
+"""
 
 import numpy as np
 import math
@@ -231,7 +232,8 @@ def dyymask():
 
 
 def filtersdev(filter : torch.tensor) -> float :
-    """Returns the actual spatial standard deviation of a 1-D PyTorch filter"""
+    """Returns the actual spatial standard deviation of a 1-D PyTorch filter
+"""
     return math.sqrt(variance1D(filter.numpy()))
 
     
