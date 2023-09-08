@@ -1,11 +1,3 @@
-import numpy as np
-from scipy.ndimage import correlate1d, correlate
-from scipy.special import ive
-from math import sqrt, exp, ceil, pi
-from scipy.special import erf, erfcinv
-from typing import NamedTuple, Union
-
-
 """Discrete Scale Space and Scale-Space Derivative Toolbox for Python
 
 For computing discrete scale-space smoothing by convolution with the discrete
@@ -48,6 +40,12 @@ Compared to the original Matlab code, the following implementation is reduced in
 - there is no passing of additional parameters to functions of the N-jet
 - this reimplementation has not yet been thoroughly tested
 """
+import numpy as np
+from scipy.ndimage import correlate1d, correlate
+from scipy.special import ive
+from math import sqrt, exp, ceil, pi
+from scipy.special import erf, erfcinv
+from typing import NamedTuple, Union
 
 
 # Object for storing the parameters of a scale-space discretization method
