@@ -33,7 +33,8 @@ International Journal of Computer Vision, vol 30(2): 117-154.
 Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer 
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 
-Compared to the original Matlab code, the following implementation is reduced in the following ways:
+Compared to the original Matlab code, the following implementation is reduced 
+in the following ways:
 - there is no handling of scale normalization powers gamma that are not equal to one
 - Lp-normalization is only implemented for p = 1
 - much fewer functions of the N-jet have so far been implemented
@@ -50,7 +51,8 @@ from typing import NamedTuple, Union
 
 # Object for storing the parameters of a scale-space discretization method
 class ScSpMethod(NamedTuple):
-    methodname: str # either 'discgauss', 'samplgauss', 'normsamplgauss', 'intgauss' or 'linintgauss'
+    # either 'discgauss', 'samplgauss', 'normsamplgauss', 'intgauss' or 'linintgauss'
+    methodname: str 
     epsilon: float
 
     
@@ -99,7 +101,7 @@ are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one
 for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
 kernel is also equal to the sigma value.
 
-In summary, the different methods have the possible advantages (+) and disadvantages (-):
+The different methods have the possible advantages (+) and disadvantages (-):
 
   'discgauss' + guarantees non-enhancement of local extrema over a 2-D image domain
               + guarantees non-creation of new extrema from any finer to any
@@ -114,7 +116,8 @@ In summary, the different methods have the possible advantages (+) and disadvant
                - for very small values of sigma the kernels have too narrow shape
 
   'normsamplgauss' + no added scale offset in the spatial discretization
-                   + formally the kernel values are guaranteed to be in the interval [0, 1]
+                   + formally the kernel values are guaranteed to be in the 
+                     interval [0, 1]
                    + formally the kernel values are guaranteed to sum up to 1 
                    - the complementary normalization of the kernel is ad hoc
                    - for very small values of sigma the kernels have too narrow shape
@@ -372,7 +375,8 @@ def make1Dnormsamplgaussfilter(
         D : int = 1
         ) -> np.ndarray :
     """Generates a normalized sampled Gaussian kernel with standard deviation sigma, 
-given an upper bound on the relative truncation error epsilon over a D-dimensional domain.
+given an upper bound on the relative truncation error epsilon over a D-dimensional 
+domain.
 """
     prelfilter = make1Dsamplgaussfilter(sigma, epsilon, D)
     return prelfilter/np.sum(prelfilter)
@@ -448,8 +452,9 @@ def linintgaussconv(
         sigma : float,
         epsilon : float = 0.00000001
         ) -> np.ndarray :
-    """Convolves the 2-D image inpic (or a 1-D signal) with the linerily integrated Gaussian 
-kernel with standard deviation sigma and relative truncation error less than epsilon.
+    """Convolves the 2-D image inpic (or a 1-D signal) with the linerily 
+integrated Gaussian kernel with standard deviation sigma and relative 
+truncation error less than epsilon.
 
 The transformation from the input image will always be a scale-space transformation,
 in the sense that for a 1-D signal the number of local extrema in the smoothed
@@ -496,18 +501,21 @@ def make1Dlinintgaussfilter(
         epsilon : float = 0.00000001,
         D : int = 1
         ) -> np.ndarray :
-    """Generates a linearily integrated Gaussian kernel with standard deviation sigma, given 
-an upper bound on the relative truncation error epsilon over a D-dimensional domain.
+    """Generates a linearily integrated Gaussian kernel with standard deviation 
+sigma, given an upper bound on the relative truncation error epsilon over a 
+D-dimensional domain.
 
 Remark: Adds additional spatial variance 1/6 to the kernel
 """
     vecsize = ceil(1.1*gaussfiltsize(sigma, epsilon, D))
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
-    # The following equation is the result of a closed form integration of the expression
-    # for the filter coefficients in Eq (3.90) in Lindeberg (1993)
+    # The following equation is the result of a closed form integration of
+    # the expression for the filter coefficients in Eq (3.90) in Lindeberg (1993)
     # Scale-Space Theory in Computer Vision, Springer.
-    return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + x_scaled_erf(x - 1, sigma) + \
-           sigma**2 * (gauss(x + 1, sigma) - 2*gauss(x, sigma) + gauss(x - 1, sigma))
+    return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + \
+           x_scaled_erf(x - 1, sigma) + \
+           sigma**2 * (gauss(x + 1, sigma) - 2*gauss(x, sigma) + \
+                       gauss(x - 1, sigma))
 
 
 def x_scaled_erf(x : np.ndarray, sigma : float = 1.0):
@@ -515,8 +523,9 @@ def x_scaled_erf(x : np.ndarray, sigma : float = 1.0):
 
 
 def gaussfiltsize(sigma : float, epsND : float, D : int) -> float :
-    """Estimates the necessary size to truncate a Gaussian kernel with standard deviation
-sigma to a relative truncation epsND over a D-dimensional domain.
+    """Estimates the necessary size to truncate a Gaussian kernel with 
+standard deviation sigma to a relative truncation epsND over a D-dimensional 
+domain.
 """
     s = sigma*sigma
     eps1D = truncerrtransf(epsND, D)
@@ -756,129 +765,203 @@ blob detection and corner detection. The differential expressions 'Lp', 'Lq',
         if (njetfcn == 'L'):
             outpic = smoothpic
         elif (njetfcn == 'Lx'):
-            outpic = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
+            outpic = normderfactor(1, 0, sigma, normdermethod) * \
+                     correlate(smoothpic, dxmask())
         elif (njetfcn == 'Ly'):
-            outpic = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
+            outpic = normderfactor(0, 1, sigma, normdermethod) * \
+                     correlate(smoothpic, dymask())
         elif (njetfcn == 'Lxx'):
-            outpic = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
+            outpic = normderfactor(2, 0, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxmask())
         elif (njetfcn == 'Lxy'):
-            outpic = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
+            outpic = normderfactor(1, 1, sigma, normdermethod) * \
+                     correlate(smoothpic, dxymask())
         elif (njetfcn == 'Lyy'):
-            outpic = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            outpic = normderfactor(0, 2, sigma, normdermethod) * \
+                     correlate(smoothpic, dyymask())
         elif (njetfcn == 'Lv'):
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())   
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())   
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
             outpic = np.sqrt(Lx*Lx + Ly*Ly)
         elif (njetfcn == 'Lv2'):
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())   
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())   
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
             outpic = Lx*Lx + Ly*Ly
         elif (njetfcn == 'Laplace'):
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())   
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())   
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
             outpic = Lxx + Lyy
         elif (njetfcn == 'detHessian'):
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
             outpic = Lxx*Lyy - Lxy*Lxy
         elif (njetfcn == 'sqrtdetHessian'):
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
             detHessian = Lxx*Lyy - Lxy*Lxy
             outpic = np.sign(detHessian) * np.sqrt(np.abs(detHessian))
         elif (njetfcn == 'Kappa'):
             # Rescaled level curve curvature
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
             outpic = Ly*Ly*Lxx + Lx*Lx*Lyy - 2*Lx*Ly*Lxy
         elif (njetfcn == 'Lv2Lvv'):
             # 2nd-order derivative in gradient direction (used for edge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
             outpic = Lx*Lx*Lxx + 2*Lx*Ly*Lxy + Ly*Ly*Lyy
         elif (njetfcn == 'Lv3Lvvv'):
             # 3rd-order derivative in gradient direction (used for edge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            Lxxx = normderfactor(3, 0, sigma, normdermethod) * correlate(smoothpic, dxxxmask())
-            Lxxy = normderfactor(2, 1, sigma, normdermethod) * correlate(smoothpic, dxxymask())
-            Lxyy = normderfactor(1, 2, sigma, normdermethod) * correlate(smoothpic, dxyymask())
-            Lyyy = normderfactor(0, 3, sigma, normdermethod) * correlate(smoothpic, dyyymask())
-            outpic = Lx*Lx*Lx*Lxxx + 3*Lx*Lx*Ly*Lxxy + 3*Lx*Ly*Ly*Lxyy + Ly*Ly*Ly*Lyyy
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
+            Lxxx = normderfactor(3, 0, sigma, normdermethod) * \
+                   correlate(smoothpic, dxxxmask())
+            Lxxy = normderfactor(2, 1, sigma, normdermethod) * \
+                   correlate(smoothpic, dxxymask())
+            Lxyy = normderfactor(1, 2, sigma, normdermethod) * \
+                   correlate(smoothpic, dxyymask())
+            Lyyy = normderfactor(0, 3, sigma, normdermethod) * \
+                   correlate(smoothpic, dyyymask())
+            outpic = Lx*Lx*Lx*Lxxx + 3*Lx*Lx*Ly*Lxxy + \
+                     3*Lx*Ly*Ly*Lxyy + Ly*Ly*Ly*Lyyy
         elif (njetfcn == 'Lp'):
-            # 1st-order derivative in principal curvature direction (used for ridge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            tmp = (Lxx - Lyy) /(np.finfo(float).eps + np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
+            # 1st-order derivative in first principal curvature direction
+            # (used for ridge detection)
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
+            tmp = (Lxx - Lyy) /(np.finfo(float).eps + \
+                                np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
             cosbeta = np.sqrt((1 + tmp)/2)
             sinbeta = np.sign(Lxy) * np.sqrt((1 - tmp)/2)
             outpic = sinbeta * Lx - cosbeta * Ly
         elif (njetfcn == 'Lq'):
-            # 1st-order derivative in principal curvature (used for ridge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            tmp = (Lxx - Lyy) /(np.finfo(float).eps + np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
+            # 1st-order derivative in second principal curvature
+            # (used for valley detection)
+            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+                 correlate(smoothpic, dxmask())
+            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+                 correlate(smoothpic, dymask())
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
+            tmp = (Lxx - Lyy) /(np.finfo(float).eps + \
+                                np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
             cosbeta = np.sqrt((1 + tmp)/2)
             sinbeta = np.sign(Lxy) * np.sqrt((1 - tmp)/2)
             outpic = cosbeta * Lx + sinbeta * Ly
         elif (njetfcn == 'Lpp'):
-            # 2nd-order derivative in principal curvature direction 
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            outpic = ((Lxx + Lyy) - np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
+            # 2nd-order derivative in first principal curvature direction
+            # (used for ridge detection)
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
+            outpic = ((Lxx + Lyy) - \
+                      np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
         elif (njetfcn == 'Lqq'):
-            # 2nd-order derivative in principal curvature direction 
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * correlate(smoothpic, dyymask())
-            outpic = ((Lxx + Lyy) + np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
+            # 2nd-order derivative in second principal curvature direction
+            # (used for valley detection)
+            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+                  correlate(smoothpic, dxxmask())
+            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+                  correlate(smoothpic, dxymask())
+            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+                  correlate(smoothpic, dyymask())
+            outpic = ((Lxx + Lyy) + \
+                      np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
         elif (njetfcn == 'Lxxx'):
-            outpic = normderfactor(3, 0, sigma, normdermethod) * correlate(smoothpic, dxxxmask())
+            outpic = normderfactor(3, 0, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxxmask())
         elif (njetfcn == 'Lxxy'):
-            outpic = normderfactor(2, 1, sigma, normdermethod) * correlate(smoothpic, dxxymask())
+            outpic = normderfactor(2, 1, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxymask())
         elif (njetfcn == 'Lxyy'):
-            outpic = normderfactor(1, 2, sigma, normdermethod) * correlate(smoothpic, dxyymask())
+            outpic = normderfactor(1, 2, sigma, normdermethod) * \
+                     correlate(smoothpic, dxyymask())
         elif (njetfcn == 'Lyyy'):
-            outpic = normderfactor(0, 3, sigma, normdermethod) * correlate(smoothpic, dyyymask())
+            outpic = normderfactor(0, 3, sigma, normdermethod) * \
+                     correlate(smoothpic, dyyymask())
         elif (njetfcn == 'Lxxxx'):
-            outpic = normderfactor(4, 0, sigma, normdermethod) * correlate(smoothpic, dxxxxmask())
+            outpic = normderfactor(4, 0, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxxxmask())
         elif (njetfcn == 'Lxxxy'):
-            outpic = normderfactor(3, 1, sigma, normdermethod) * correlate(smoothpic, dxxxymask())
+            outpic = normderfactor(3, 1, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxxymask())
         elif (njetfcn == 'Lxxyy'):
-            outpic = normderfactor(2, 2, sigma, normdermethod) * correlate(smoothpic, dxxyymask())
+            outpic = normderfactor(2, 2, sigma, normdermethod) * \
+                     correlate(smoothpic, dxxyymask())
         elif (njetfcn == 'Lxyyy'):
-            outpic = normderfactor(1, 3, sigma, normdermethod) * correlate(smoothpic, dxyyymask())
+            outpic = normderfactor(1, 3, sigma, normdermethod) * \
+                     correlate(smoothpic, dxyyymask())
         elif (njetfcn == 'Lyyyy'):
-            outpic = normderfactor(0, 4, sigma, normdermethod) * correlate(smoothpic, dyyyymask())
+            outpic = normderfactor(0, 4, sigma, normdermethod) * \
+                     correlate(smoothpic, dyyyymask())
         else:
             raise ValueError('NJetFcn %s not implemented yet' % njetfcn)
 
     return outpic
 
 
-def normderfactor(xorder : int, yorder : int, sigma : float, normdermethod) -> float :
-    """Compute the scale normalization factor for the scale-normalied Gaussian derivative
-of order xorder in the x-direction and order yorder in the y-direction at scale sigma
-in units of the standard deviation of the Gaussian kernel and using the scale normalization
-method normdermethod.
+def normderfactor(
+        xorder : int,
+        yorder : int,
+        sigma : float,
+        normdermethod) -> float :
+    """Compute the scale normalization factor for the scale-normalied 
+Gaussian derivative of order xorder in the x-direction and of order yorder 
+in the y-direction at scale sigma in units of the standard deviation of 
+the Gaussian kernel and using the scale normalization method normdermethod.
 """
     if (isinstance(normdermethod, str)):
         normdermethod = defaultscspnormdermethodobject(normdermethod)
@@ -895,51 +978,67 @@ method normdermethod.
                 value = \
                 (normgaussder1D_L1norm(xorder, sigma) * \
                 normgaussder1D_L1norm(yorder, sigma)) / \
-                (discgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
-                discgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+                (discgaussder1D_L1norm(xorder, sigma, \
+                                      normdermethod.scspmethod.epsilon) * \
+                discgaussder1D_L1norm(yorder, sigma, \
+                                      normdermethod.scspmethod.epsilon))
             else:
-                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+                raise ValueError('Lp-normalization so far only implemented \
+for gamma = 1.0')
         elif (normdermethod.scspmethod.methodname == 'samplgauss'):
             if (normdermethod.gamma == 1.0):
                 value = \
                 (normgaussder1D_L1norm(xorder, sigma) * \
                 normgaussder1D_L1norm(yorder, sigma)) / \
-                (samplgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
-                samplgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+                (samplgaussder1D_L1norm(xorder, sigma, \
+                                        normdermethod.scspmethod.epsilon) * \
+                samplgaussder1D_L1norm(yorder, sigma, \
+                                       normdermethod.scspmethod.epsilon))
             else:
-                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+                raise ValueError('Lp-normalization so far only implemented \
+for gamma = 1.0')
         elif (normdermethod.scspmethod.methodname == 'normsamplgauss'):
             if (normdermethod.gamma == 1.0):
                 value = \
                 (normgaussder1D_L1norm(xorder, sigma) * \
                 normgaussder1D_L1norm(yorder, sigma)) / \
-                (normsamplgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
-                 normsamplgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+                (normsamplgaussder1D_L1norm(xorder, sigma, \
+                                            normdermethod.scspmethod.epsilon) * \
+                 normsamplgaussder1D_L1norm(yorder, sigma, \
+                                            normdermethod.scspmethod.epsilon))
             else:
-                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+                raise ValueError('Lp-normalization so far only implemented \
+for gamma = 1.0')
         elif (normdermethod.scspmethod.methodname == 'intgauss'):
             if (normdermethod.gamma == 1.0):
                 value = \
                 (normgaussder1D_L1norm(xorder, sigma) * \
                 normgaussder1D_L1norm(yorder, sigma)) / \
-                (intgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
-                intgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+                (intgaussder1D_L1norm(xorder, sigma, \
+                                      normdermethod.scspmethod.epsilon) * \
+                intgaussder1D_L1norm(yorder, sigma, \
+                                     normdermethod.scspmethod.epsilon))
             else:
-                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+                raise ValueError('Lp-normalization so far only implemented \
+for gamma = 1.0')
         elif (normdermethod.scspmethod.methodname == 'linintgauss'):
             if (normdermethod.gamma == 1.0):
                 value = \
                 (normgaussder1D_L1norm(xorder, sigma) * \
                 normgaussder1D_L1norm(yorder, sigma)) / \
-                (linintgaussder1D_L1norm(xorder, sigma, normdermethod.scspmethod.epsilon) * \
-                linintgaussder1D_L1norm(yorder, sigma, normdermethod.scspmethod.epsilon))
+                (linintgaussder1D_L1norm(xorder, sigma, \
+                                         normdermethod.scspmethod.epsilon) * \
+                linintgaussder1D_L1norm(yorder, sigma, \
+                                        normdermethod.scspmethod.epsilon))
             else:
-                raise ValueError('Lp-normalization so far only implemented for gamma = 1.0')
+                raise ValueError('Lp-normalization so far only implemented \
+for gamma = 1.0')
         else:
-            raise ValueError('Lp-normalization not implemented for scale-space derivative method %s' \
-                                 % normdermethod.scspmethod.methodname)
+            raise ValueError('Lp-normalization not implemented for \
+scale-space derivative method %s' % normdermethod.scspmethod.methodname)
     else:
-        raise ValueError('Derivative method %s not implemented yet' % normdermethod.normdermethod)
+        raise ValueError('Derivative method %s not implemented yet' \
+                         % normdermethod.normdermethod)
 
     return value
 
@@ -949,9 +1048,9 @@ def normgaussder1D_L1norm(
         sigma : float,
         gammapar : float = 1.0
         ) -> float :
-    """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative of order sigma
-and at scale sigma in units of the standard deviation of the Gaussian kernel, using
-the scale normalization parameter gammapar.
+    """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative 
+of order sigma and at scale sigma in units of the standard deviation of 
+the Gaussian kernel, using the scale normalization parameter gammapar.
 """
     s = sigma*sigma
     

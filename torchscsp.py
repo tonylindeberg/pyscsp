@@ -45,7 +45,8 @@ networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 
 
 def make1Dgaussfilter(
-        sigma : Union[float, torch.Tensor], # 0-D PyTorch tensor if sigma is to be learned
+        # 0-D PyTorch tensor if sigma is to be learned
+        sigma : Union[float, torch.Tensor], 
         scspmethod : str = 'discgauss',
         epsilon : float = 0.01, #
         D : int = 1
@@ -111,9 +112,11 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     if (scspmethod == 'normsamplgauss'):
         return make1Dnormsamplgaussfilter(sigma, epsilon, D)
     elif (scspmethod == 'discgauss'):
-        # ==>> Note! Here sigma is not PyTorch variable to allow for scale adaptation by backprop
-        # ==>> That would need a PyTorch interface for modified Bessel functions
-        return torch.from_numpy(make1Ddiscgaussfilter(sigma, epsilon, D)).type(torch.FloatTensor)
+        # ==>> Note! Here sigma is not PyTorch variable to allow for scale
+        # ==>> adaptation by backprop. That would need a PyTorch interface
+        # ==>> for the modified Bessel functions
+        return torch.from_numpy(\
+               make1Ddiscgaussfilter(sigma, epsilon, D)).type(torch.FloatTensor)
     elif (scspmethod == 'intgauss'):
         return make1Dintgaussfilter(sigma, epsilon, D)
     elif (scspmethod == 'linintgauss'):
@@ -176,10 +179,13 @@ def make1Dlinintgaussfilter(
     # Remark: Adds additional spatial variance 1/6 to the kernel
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
-    # The following equation is the result of a closed form integration of the expression
-    # for the filter coefficients in Eq (2.89) on page 52 in Lindeberg's PhD thesis from 1991
-    return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + x_scaled_erf(x - 1, sigma) + \
-           sigma**2 * (gauss(x + 1, sigma) - 2*gauss(x, sigma) + gauss(x - 1, sigma))
+    # The following equation is the result of a closed form integration of
+    # the expression for the filter coefficients in Eq (3.80) on page 97
+    # in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer
+    return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + \
+           x_scaled_erf(x - 1, sigma) + \
+           sigma**2 * (gauss(x + 1, sigma) - \
+           2*gauss(x, sigma) + gauss(x - 1, sigma))
 
 
 def x_scaled_erf(
@@ -198,7 +204,8 @@ networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 using variance-based normalization of the Gaussian derivative operators 
 for scale normalization parameter gamma = 1.
 """
-    return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
+    return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + \
+           sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
 
 
 def dxmask():
