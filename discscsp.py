@@ -19,8 +19,8 @@ Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
 Pattern Analysis and Machine Intelligence, 12(3): 234--254.
 
 Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
-A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
-3(4): 349-376.
+A basis for low-level feature detection", Journal of Mathematical Imaging and 
+Vision, 3(4): 349-376.
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
@@ -121,10 +121,11 @@ In summary, the different methods have the possible advantages (+) and disadvant
 
   'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
              + the kernel values are guaranteed to sum up to 1 over an infinite domain
-             - the box integration introduces a scale offset of 1/12
+             - the box integration introduces a scale offset of 1/12 at coarser scales
 
   'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
                 - the triangular window integration introduces a scale offset of 1/6
+                  at coarser scales
 
 Besides being a string, the argument scspmethod may also be an object
 having the attributes scspmethod.methodname and scspmethod.epsilon.
@@ -158,15 +159,12 @@ def scaleoffset_variance(
         scspmethod : Union[str, ScSpMethod] = 'discgauss'
         ) -> float :
     """Returns the scale offset that the scale-space discretization method
-scspmethod gives rise to.
+scspmethod gives rise to at coarser scales. At finer scales, however, the
+added offset may be lower.
 
 Note that this scale offset is given in units of the variance s = sigma^2
 of the kernel, as opposed to the standard deviation sigma, motivated by
 the additive property of variances under convolution of non-negative kernels.
-
-The value of this scale offset can be used in later stages to compensate
-for the non-zero scale offset implied by the scale-space discretization
-methods 'intgauss' and 'linintgauss'.
 """
     if (isinstance(scspmethod, str)):
         scspmethodname = scspmethod
@@ -322,8 +320,9 @@ def normsamplgaussconv(
         sigma : float,
         epsilon : float = 0.00000001
         ) -> np.ndarray :
-    """Convolves the 2-D image inpic (or a 1-D signal) with the normalized sampled Gaussian 
-kernel with standard deviation sigma and relative truncation error less than epsilon.
+    """Convolves the 2-D image inpic (or a 1-D signal) with the normalized 
+sampled Gaussian kernel with standard deviation sigma and relative truncation 
+error less than epsilon.
 
 The transformation from the input image will always be a scale-space transformation,
 in the sense that for a 1-D signal the number of local extrema in the smoothed
@@ -334,6 +333,9 @@ be a scale-space transformation.
 By a normalization of the discrete sampled Gaussian filter to unit l_1-norm,
 this approach avoids the problems that the regular sampled Gaussian kernel
 may assume values greater than 1 and the kernel values do not sum to 1.
+The resulting filter kernel will, however, still be too narrow at very
+fine scale, meaning that the normalization does not really solve the
+real problems with the sampled Gaussian kernel at very fine scales.
 
 For a theoretical explanations of the properties of the regular sampled
 Gaussian kernel, see Section VII.A in
@@ -394,9 +396,10 @@ The kernel values of the resulting discrete approximation of the Gaussian kernel
 do in the ideal infinite case exactly sum up to one, and are also confined in the 
 interval [0, 1]. The spatial integration of the Gaussian kernel over the support
 region of each pixel does, however, add a scale offset of 1/12 in units of the
-variance equal to the squared standard deviation of the kernel. This added 
-variance corresponds to the spatial variance of a box filter over the support 
-region of the image pixel over which the continuous Gaussian kernel is integrated.
+variance equal to the squared standard deviation of the kernel at coarser scales.
+This added variance corresponds to the spatial variance of a box filter over the 
+support region of the image pixel over which the continuous Gaussian kernel is 
+integrated.
 
 For a theoretical explanation of these properties, see Section 3.6.3 in
 
@@ -457,10 +460,10 @@ be a scale-space transformation.
 The kernel values of the resulting discrete approximation of the Gaussian kernel
 are confined in the interval [0, 1]. The spatial integration of the Gaussian kernel 
 over the support region of each pixel does, however, add a scale offset of 1/6 in 
-units of the variance equal to the squared standard deviation of the kernel.
-This added variance corresponds to the spatial variance of a triangular 
-extending to the neigbouring pixels, which is used as spatial window function
-when integrating the continuous Gaussian kernel. That triangular filter
+units of the variance equal to the squared standard deviation of the kernel at
+coarser scales. This added variance corresponds to the spatial variance of a 
+triangular extending to the neigbouring pixels, which is used as spatial window 
+function when integrating the continuous Gaussian kernel. That triangular filter
 does in turn correspond to the convolution of a box filter over a pixel
 support region by itself, thus explaining the doubling of the scale offset
 in relation to the scale offset for the integrated Gaussian kernel.
@@ -1203,6 +1206,33 @@ def filtermean(filter : np.ndarray) -> (float, float) :
     return xmean, ymean
 
 
+def mean1D(filter : np.ndarray) -> float:
+    """Computes the spatial mean of a non-negative filter."""
+    
+    if filter.ndim != 1:
+        raise ValueError('Only implemented for 1-D filters')
+
+    size = filter.shape[0]
+    x = np.linspace(0, size-1, size)
+
+    return np.sum(np.sum(x * filter)) / np.sum(np.sum(filter))
+
+
+def variance1D(filter : np.ndarray) -> float:
+    """Computes the spatial variance of a non-negative filter."""
+    
+    if filter.ndim != 1:
+        raise ValueError('Only implemented for 1-D filters')
+
+    size = filter.shape[0]
+    x = np.linspace(0, size-1, size)
+
+    x2mom = np.sum(np.sum(x * x * filter)) / np.sum(np.sum(filter))
+    xmean = mean1D(filter)
+
+    return x2mom - xmean * xmean
+
+
 def RGB2LUV(inpic) -> np.ndarray:
     """Converts an RGB colour image to a colour-opponent LUV colour space"""
     inpic = np.array(inpic)
@@ -1219,5 +1249,3 @@ def RGB2L(inpic) -> np.ndarray:
     return((inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0)
 
 
-if __name__ == '__main__': 
-    main() 
