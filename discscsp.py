@@ -1178,8 +1178,8 @@ def variance(filter : np.ndarray) -> np.ndarray:
 
     xmean, ymean = filtermean(filter)
 
-    return [[x2mom - xmean*xmean, xymom - xmean*ymean], \
-            [xymom - xmean*ymean, y2mom - ymean*ymean]]
+    return np.array([[x2mom - xmean*xmean, xymom - xmean*ymean], \
+                     [xymom - xmean*ymean, y2mom - ymean*ymean]])
 
 
 def filtermean(filter : np.ndarray) -> (float, float) :
