@@ -45,12 +45,12 @@ networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 
 
 def make1Dgaussfilter(
-        # 0-D PyTorch tensor if sigma is to be learned
+        # sigma should be a 0-D PyTorch tensor if sigma is to be learned
         sigma : Union[float, torch.Tensor], 
         scspmethod : str = 'discgauss',
         epsilon : float = 0.01, #
         D : int = 1
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     """Generates a mask for discrete approximation of the Gaussian kernel 
 by separable filtering, using either of the methods:
 
@@ -129,7 +129,7 @@ def make1Dsamplgaussfilter(
         sigma : Union[float, torch.Tensor],
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     return gauss(x, sigma)
@@ -138,7 +138,7 @@ def make1Dsamplgaussfilter(
 def gauss(
         x : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)))
 
 
@@ -146,7 +146,7 @@ def make1Dnormsamplgaussfilter(
         sigma : torch.Tensor,
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     prelfilter = make1Dsamplgaussfilter(sigma, epsilon, D)
     return prelfilter/torch.sum(prelfilter)
 
@@ -155,7 +155,7 @@ def make1Dintgaussfilter(
         sigma : torch.Tensor,
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     # Box integrated Gaussian kernel over each pixel support region
     # Remark: Adds additional spatial variance 1/12 to the kernel
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
@@ -166,7 +166,7 @@ def make1Dintgaussfilter(
 def scaled_erf(
         z : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     return 1/2*(1 + torch.erf(z/(math.sqrt(2)*sigma)))
 
 
@@ -174,7 +174,7 @@ def make1Dlinintgaussfilter(
         sigma : torch.Tensor,
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     # Linearly integrated Gaussian kernel over each extended pixel support region 
     # Remark: Adds additional spatial variance 1/6 to the kernel
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
@@ -191,7 +191,7 @@ def make1Dlinintgaussfilter(
 def x_scaled_erf(
         x : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+) -> torch.Tensor :
     return x * scaled_erf(x, sigma)
 
 

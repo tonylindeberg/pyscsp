@@ -70,7 +70,7 @@ def scspnormdermethodobject(
         normdermethod : str = 'Lpnorm',
         gamma : float = 1.0,
         epsilon : float = 0.00000001
-        ) -> ScSpNormDerMethod :
+) -> ScSpNormDerMethod :
     return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod, gamma)
 
 
@@ -79,7 +79,7 @@ def scspconv(
         sigma : float,
         scspmethod : Union[str, ScSpMethod] = 'discgauss',
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Computes the scale-space representation of the 2-D image inpic (or a 1-D signal) 
 at scale level sigma in units of the standard deviation of the Gaussian kernel that 
 is approximated discretely with the method scspmethod and with the formally infinite 
@@ -160,7 +160,7 @@ for separable filtering over a D-dimensional domain.
 
 def scaleoffset_variance(
         scspmethod : Union[str, ScSpMethod] = 'discgauss'
-        ) -> float :
+) -> float :
     """Returns the scale offset that the scale-space discretization method
 scspmethod gives rise to at coarser scales. At finer scales, however, the
 added offset may be lower.
@@ -194,7 +194,7 @@ def discgaussconv(
         inpic,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the discrete analogue of 
 the Gaussian kernel with standard deviation sigma and relative truncation error 
 less than epsilon.
@@ -242,7 +242,7 @@ def make1Ddiscgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
         D : int = 1
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Generates a 1-D discrete analogue of the Gaussian kernel at scale level sigma
 in units of the standard deviation of the kernel and with relative truncation error
 not exceeding epsilon as a relative number over a D-dimensional spatial domain.
@@ -260,7 +260,7 @@ def samplgaussconv(
         inpic,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the sampled Gaussian 
 kernel with standard deviation sigma and relative truncation error less than epsilon.
 
@@ -305,7 +305,7 @@ def make1Dsamplgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
         D : int = 1
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Generates a sampled Gaussian kernel with standard deviation sigma, given an
 upper bound on the relative truncation error epsilon over a D-dimensional domain.
 """
@@ -322,7 +322,7 @@ def normsamplgaussconv(
         inpic,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the normalized 
 sampled Gaussian kernel with standard deviation sigma and relative truncation 
 error less than epsilon.
@@ -373,7 +373,7 @@ def make1Dnormsamplgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
         D : int = 1
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Generates a normalized sampled Gaussian kernel with standard deviation sigma, 
 given an upper bound on the relative truncation error epsilon over a D-dimensional 
 domain.
@@ -386,7 +386,7 @@ def intgaussconv(
         inpic,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the integrated Gaussian 
 kernel with standard deviation sigma and relative truncation error less than epsilon.
 
@@ -429,10 +429,10 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
 
 def make1Dintgaussfilter(
-    sigma : float,
-    epsilon : float = 0.00000001,
-    D : int = 1
-    ) -> np.ndarray :
+        sigma : float,
+        epsilon : float = 0.00000001,
+        D : int = 1
+) -> np.ndarray :
     """Generates an integrated Gaussian kernel with standard deviation sigma, given an
 upper bound on the relative truncation error epsilon over a D-dimensional domain.
 
@@ -451,7 +451,7 @@ def linintgaussconv(
         inpic,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Convolves the 2-D image inpic (or a 1-D signal) with the linerily 
 integrated Gaussian kernel with standard deviation sigma and relative 
 truncation error less than epsilon.
@@ -500,7 +500,7 @@ def make1Dlinintgaussfilter(
         sigma : float,
         epsilon : float = 0.00000001,
         D : int = 1
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Generates a linearily integrated Gaussian kernel with standard deviation 
 sigma, given an upper bound on the relative truncation error epsilon over a 
 D-dimensional domain.
@@ -670,7 +670,7 @@ def computeNjetfcn(
         njetfcn : str,
         sigma : float,
         normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
 of the image inpic at scale level sigma in units of the standard deviation of
 the Gaussian kernel, and using the scale normalization method normdermethod.
@@ -716,11 +716,11 @@ applying the function applyNjetfcn() multiple times for each N-jetfcn.
 
 
 def applyNjetfcn(
-        smoothpic,
+        smoothpic : np.ndarray,
         njetfcn : str,
         sigma : float = 1.0,
         normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
-        ) -> np.ndarray :
+) -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
 to an already computed scale-space representation at scale level sigma in units
 of the standard deviation of the Gaussian kernel, and using the scale normalization
@@ -957,7 +957,8 @@ def normderfactor(
         xorder : int,
         yorder : int,
         sigma : float,
-        normdermethod) -> float :
+        normdermethod : Union[str, ScSpNormDerMethod]
+) -> float :
     """Compute the scale normalization factor for the scale-normalied 
 Gaussian derivative of order xorder in the x-direction and of order yorder 
 in the y-direction at scale sigma in units of the standard deviation of 
@@ -1047,7 +1048,7 @@ def normgaussder1D_L1norm(
         order : int,
         sigma : float,
         gammapar : float = 1.0
-        ) -> float :
+) -> float :
     """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative 
 of order sigma and at scale sigma in units of the standard deviation of 
 the Gaussian kernel, using the scale normalization parameter gammapar.
@@ -1075,7 +1076,11 @@ the Gaussian kernel, using the scale normalization parameter gammapar.
     return value
 
 
-def discgaussder1D_L1norm(order, sigma, epsilon=0.00000001) -> float :
+def discgaussder1D_L1norm(
+        order : int,
+        sigma : float,
+        epsilon : float = 0.00000001
+) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D discrete analogue 
 of the Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -1102,7 +1107,7 @@ def samplgaussder1D_L1norm(
         order : int,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> float :
+) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
 Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -1129,7 +1134,7 @@ def normsamplgaussder1D_L1norm(
         order : int,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> float :
+) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
 Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -1156,7 +1161,7 @@ def intgaussder1D_L1norm(
         order : int,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> float :
+) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D integrated 
 Gaussian kernel at scale level sigma in units of the standard deviation and 
 truncated at the tails with a relative approximation error less than epsilon.
@@ -1183,7 +1188,7 @@ def linintgaussder1D_L1norm(
         order : int,
         sigma : float,
         epsilon : float = 0.00000001
-        ) -> float :
+) -> float :
     """Returns the L_1-norm of the n:th-order difference of the 1-D linearly 
 integrated Gaussian kernel at scale level sigma in units of the standard deviation 
 and truncated at the tails with a relative approximation error less than epsilon.
@@ -1207,9 +1212,9 @@ and truncated at the tails with a relative approximation error less than epsilon
 
 
 def defaultscspnormdermethodobject(
-        scspnormdermethod : str ='discgaussLp',
+        scspnormdermethod : str = 'discgaussLp',
         gamma : float = 1.0
-        ) -> ScSpNormDerMethod :
+) -> ScSpNormDerMethod :
     """Converts a user-friendly string for a method for approximating 
 scale-normalized derivatives for discrete data to a class object, including 
 also a specification of the discretization method to use for discrete 
@@ -1341,9 +1346,9 @@ def RGB2LUV(inpic) -> np.ndarray:
 """
     inpic = np.array(inpic)
     outpic = np.zeros(inpic.shape)
-    outpic[:, :, 1] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
-    outpic[:, :, 2] = 1.0*(inpic[:, :, 0] - inpic[:, :, 1])
-    outpic[:, :, 3] = (inpic[:, :, 0] + inpic[:, :, 1])/2.0 - inpic[:, :, 2]
+    outpic[:, :, 0] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
+    outpic[:, :, 1] = 1.0*(inpic[:, :, 0] - inpic[:, :, 1])
+    outpic[:, :, 2] = (inpic[:, :, 0] + inpic[:, :, 1])/2.0 - inpic[:, :, 2]
     return(outpic)
 
 
