@@ -67,7 +67,7 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
-## Where concepts in this software distribution are described in the scientific references
+## Where concepts in this software distribution are described in the scientific papers
 
 The paper (Lindeberg 1990) describes the discrete analogue of the
 Gaussian kernel used for discrete implementation of Gaussian
