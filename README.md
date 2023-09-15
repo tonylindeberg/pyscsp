@@ -105,7 +105,7 @@ the regular Gaussian derivative operators by the scale parameter s =
 sigma^2 raised to the power of gamma multiplied by the order of
 differentiation, including a way to approximate this operator for 
 discrete image data based on lp-normalization of the derivative 
-operator, with the power p in the Lp-norms related to
+operator, with the power p in the Lp-norms and lp-norms related to
 the scale normalization power gamma.
 
 The paper (Lindeberg 1998b) describes the differential definition of
