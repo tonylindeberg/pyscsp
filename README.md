@@ -52,11 +52,11 @@ International Journal of Computer Vision, vol 30(2): 77-116.
 
 Lindeberg (1998b) "Edge detection and ridge detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 117-154.
-((preprint)[https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409])
+((preprint)[http://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-40226]])
 
 Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer 
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
-((preprint)[http://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-40226])
+((preprint)[https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409])
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
