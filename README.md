@@ -2,7 +2,7 @@
 
 Contains the following subpackages:
 
-* discscsp.py: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
+## discscsp.py: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
 
 This package comprises:
 
@@ -24,7 +24,7 @@ as explanations of the theoretical properties for different discrete
 approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in discscsp.py.
 
-* torchscsp.py: Subset of functionalities for use in PyTorch:
+## torchscsp.py: Subset of functionalities for use in PyTorch:
 
 -- functions for generating 1-D discrete approximations of the Gaussian kernel
      for spatial smoothing with separable filtering in PyTorch.
