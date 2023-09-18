@@ -2,7 +2,8 @@
 
 Contains the following subpackages:
 
-## discscsp.py: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
+
+## discscsp.py: Discrete Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This package comprises:
 
@@ -24,6 +25,7 @@ as explanations of the theoretical properties for different discrete
 approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in discscsp.py.
 
+
 ## torchscsp.py: Subset of functionalities for use in PyTorch:
 
 -- functions for generating 1-D discrete approximations of the Gaussian kernel
@@ -31,6 +33,7 @@ strings for the respective functions in the source code in discscsp.py.
 	 
 -- discrete derivative approximation masks for computing discrete approximations
      of Gaussian derivatives and Gaussian derivative layers in PyTorch.
+
 
 ## References:
 
@@ -58,8 +61,8 @@ Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 ([preprint](https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409))
 
-Lindeberg (2015) ``Image matching using generalized scale-space
-interest points'', Journal of Mathematical Imaging and Vision, 52(1):
+Lindeberg (2015) "Image matching using generalized scale-space
+interest points", Journal of Mathematical Imaging and Vision, 52(1):
 3-36
 ([Open Access](https://dx.doi.org/10.1007/s10851-014-0541-0))
 
@@ -67,7 +70,8 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
-## Where concepts in this software distribution are described in the scientific papers
+
+## Relations between the scientific papers and concepts in this code:
 
 The paper (Lindeberg 1990) describes the discrete analogue of the
 Gaussian kernel used for discrete implementation of Gaussian
@@ -84,7 +88,7 @@ approximations of Gaussian derivatives, provided that the scale-space
 smoothing operattion is performed using the discrete analogue of the
 Gaussian kernel.
 
-Chapters 3-5 in (Lindeberg 1993) give a more extensive treatment of
+Chapters 3-5 in the book (Lindeberg 1993) give a more extensive treatment of
 discrete scale-space representation defined by convolution with the
 discrete analogue of the Gaussian kernel, including scale-space
 properties of discrete derivative approximations defined by applying
@@ -110,13 +114,13 @@ the scale normalization power gamma.
 
 The paper (Lindeberg 1998b) describes the differential definition of
 edge detection from local directional derivatives of the image
-intensity in the gradient direction (N-jet functions 'Lv', 'Lv2Lvv' and
+intensity in the gradient direction (N-jet functions 'Lv', 'Lv2Lvvv' and
 Lv3Lvv') as well as corresponding ridge and valley detectors defined
 from directional derivatives in the principal curvature directions (p,
 q) of the grey-level landscape (N-jet functions 'Lp', 'Lq', 'Lpp' and
 'Lqq').
 
-The paper (Lindeberg 2009) gives a comprehensive overview of basic
+The encyclopedia article (Lindeberg 2009) gives a comprehensive overview of basic
 components in scale-space theory, and can in this respect serve as a
 good first introduction to this area, including demonstrations of how
 different types of differential invariants in scale-space (in this
@@ -124,7 +128,7 @@ code referred to as N-jet functions) can be used for basic purposes of
 detecting image features in image data.
 
 The paper (Lindeberg 2015) gives a more modern treatment of some of
-the concepts described in (Lindeberg 1998a), regarding the use of
+the concepts described in the paper (Lindeberg 1998a), regarding the use of
 spatial extrema of the Laplacian operator (N-jet function 'Laplace'),
 the determinant of the Hessian operator (N-jet function 'detHessian')
 and the rescaled level curve curvature operator (N-jet function 'Kappa')
