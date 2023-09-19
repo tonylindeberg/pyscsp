@@ -46,7 +46,7 @@ from scipy.ndimage import correlate1d, correlate
 from scipy.special import ive
 from math import sqrt, exp, ceil, pi
 from scipy.special import erf, erfcinv
-from typing import NamedTuple, Union
+from typing import NamedTuple, Union, List
 
 
 # Object for storing the parameters of a scale-space discretization method
@@ -158,6 +158,56 @@ for separable filtering over a D-dimensional domain.
     return outpic
 
 
+def scspconv_mult(
+        inpic,
+        sigmavec : List[float],
+        scspmethod : Union[str, ScSpMethod] = 'discgauss',
+        epsilon : float = 0.00000001
+) -> np.ndarray :
+    """Perform a similar function as the function scscpconv, with the 
+difference that an array of sigma values can be provided instead of a 
+single value, and that the cascade smoothing property of Gaussian 
+convolution is made use of to perform the computational more
+efficiently than if applying the scspconv() function for each
+scale level separately.
+
+The output will be an array of one dimension more than for the function scspconv.
+"""
+    ndim = inpic.ndim
+
+    if (ndim == 1):
+        outpic = np.zeros((len(sigmavec), len(inpic)))
+        smoothpic = scspconv(inpic, sigmavec[0], scspmethod, epsilon)
+        outpic[0, :] = smoothpic[:]
+        for i in range(1, len(sigmavec)):
+            sigmainc = sqrt(sigmavec[i] ** 2 - sigmavec[i-1] ** 2)
+            smoothpic = scspconv(smoothpic, sigmainc, scspmethod, epsilon)
+            outpic[i, :] = smoothpic[:]
+
+    elif (ndim == 2):
+        outpic = np.zeros((len(sigmavec),) + inpic.shape)
+        smoothpic = scspconv(inpic, sigmavec[0], scspmethod, epsilon)
+        outpic[0, :, :] = smoothpic[:, :]
+        for i in range(1, len(sigmavec)):
+            sigmainc = sqrt(sigmavec[i] ** 2 - sigmavec[i-1] ** 2)
+            smoothpic = scspconv(smoothpic, sigmainc, scspmethod, epsilon)
+            outpic[i, :, :] = smoothpic[:, :]
+
+    elif (ndim == 3):
+        outpic = np.zeros((len(sigmavec),) + inpic.shape)
+        smoothpic = scspconv(inpic, sigmavec[0], scspmethod, epsilon)
+        outpic[0, :, :, :] = smoothpic[:, :, :]
+        for i in range(1, len(sigmavec)):
+            sigmainc = sqrt(sigmavec[i] ** 2 - sigmavec[i-1] ** 2)
+            smoothpic = scspconv(smoothpic, sigmainc, scspmethod, epsilon)
+            outpic[i, :, :, :] = smoothpic[:, :, :]
+
+    else:
+        raise ValueError('Cannot handle images of dimensionality %d' % ndim)
+
+    return outpic
+
+
 def scaleoffset_variance(
         scspmethod : Union[str, ScSpMethod] = 'discgauss'
 ) -> float :
@@ -223,9 +273,9 @@ Pattern Analysis and Machine Intelligence, 12(3): 234--254.
     sep1Dfilter = make1Ddiscgaussfilter(sigma, epsilon, ndim)
 
     if (ndim == 1):
-        outpic = correlate1d(inpic, sep1Dfilter)
+        outpic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter)
     elif (ndim == 2):
-        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        tmppic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter, 0)
         outpic = correlate1d(tmppic, sep1Dfilter, 1)
     elif (ndim == 3):
         # Treat as multilayer image
@@ -286,9 +336,9 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     sep1Dfilter = make1Dsamplgaussfilter(sigma, epsilon, ndim)
 
     if (ndim == 1):
-        outpic = correlate1d(inpic, sep1Dfilter)
+        outpic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter)
     elif (ndim == 2):
-        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        tmppic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter, 0)
         outpic = correlate1d(tmppic, sep1Dfilter, 1)
     elif (ndim == 3):
         # Treat as multilayer image
@@ -354,9 +404,9 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     sep1Dfilter = make1Dnormsamplgaussfilter(sigma, epsilon, ndim)
 
     if (ndim == 1):
-        outpic = correlate1d(inpic, sep1Dfilter)
+        outpic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter)
     elif (ndim == 2):
-        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        tmppic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter, 0)
         outpic = correlate1d(tmppic, sep1Dfilter, 1)
     elif (ndim == 3):
         # Treat as multilayer image
@@ -413,9 +463,9 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     sep1Dfilter = make1Dintgaussfilter(sigma, epsilon, ndim)
 
     if (ndim == 1):
-        outpic = correlate1d(inpic, sep1Dfilter)
+        outpic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter)
     elif (ndim == 2):
-        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        tmppic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter, 0)
         outpic = correlate1d(tmppic, sep1Dfilter, 1)
     elif (ndim == 3):
         # Treat as multilayer image
@@ -481,9 +531,9 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
     sep1Dfilter = make1Dlinintgaussfilter(sigma, epsilon, ndim)
 
     if (ndim == 1):
-        outpic = correlate1d(inpic, sep1Dfilter)
+        outpic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter)
     elif (ndim == 2):
-        tmppic = correlate1d(inpic, sep1Dfilter, 0)
+        tmppic = correlate1d(np.array(inpic).astype('float'), sep1Dfilter, 0)
         outpic = correlate1d(tmppic, sep1Dfilter, 1)
     elif (ndim == 3):
         # Treat as multilayer image
@@ -1344,7 +1394,7 @@ def variance1D(filter : np.ndarray) -> float:
 def RGB2LUV(inpic) -> np.ndarray:
     """Converts an RGB colour image to a colour-opponent LUV colour space.
 """
-    inpic = np.array(inpic)
+    inpic = np.array(inpic).astype('float')
     outpic = np.zeros(inpic.shape)
     outpic[:, :, 0] = (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
     outpic[:, :, 1] = 1.0*(inpic[:, :, 0] - inpic[:, :, 1])
@@ -1355,7 +1405,7 @@ def RGB2LUV(inpic) -> np.ndarray:
 def RGB2L(inpic) -> np.ndarray:
     """Converts an RGB colour image to a greylevel image
 """
-    inpic = np.array(inpic)
+    inpic = np.array(inpic).astype('float')
     return((inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0)
 
 
