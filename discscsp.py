@@ -171,11 +171,11 @@ convolution is then made use of to perform the computational more
 efficiently than if applying the scspconv function for each
 scale level separately.
 
-eNote, however, that the cascade smoothing property works best when
+Note, however, that the cascade smoothing property works best when
 using the discrete analogue of the Gaussian kernel 'discgauss', for
 which the cascade smoothing property holds exactly in the ideal
 case of an infinite image domain with kernels the smoothing kernels
-having infinite support. For the otherw ways of approximating the
+having infinite support. For the other ways of approximating the
 Gaussian kernel discretely, there may be deviations depending on
 the scale values.
 
