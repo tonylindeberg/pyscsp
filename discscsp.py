@@ -167,9 +167,17 @@ def scspconv_mult(
     """Perform a similar function as the function scscpconv, with the 
 difference that an array of sigma values can be provided instead of a 
 single value, and that the cascade smoothing property of Gaussian 
-convolution is made use of to perform the computational more
-efficiently than if applying the scspconv() function for each
+convolution is then made use of to perform the computational more
+efficiently than if applying the scspconv function for each
 scale level separately.
+
+eNote, however, that the cascade smoothing property works best when
+using the discrete analogue of the Gaussian kernel 'discgauss', for
+which the cascade smoothing property holds exactly in the ideal
+case of an infinite image domain with kernels the smoothing kernels
+having infinite support. For the otherw ways of approximating the
+Gaussian kernel discretely, there may be deviations depending on
+the scale values.
 
 The output will be an array of one dimension more than for the function scspconv.
 """
