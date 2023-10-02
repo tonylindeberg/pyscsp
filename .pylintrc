@@ -1,0 +1,8 @@
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=make1Dgaussfilter,make1Ddiscgaussfilter,make1Dsamplgaussfilter,make1Dnormsamplgaussfilter,make1Dintgaussfilter,make1Dlinintgaussfilter,D,z,C0,Cx,Cy,Cxx,Cxy,Cyy,i,sep1Dfilter,s,epsND,eps1D,N,i,xc,yc,computeNjetfcn,applyNjetfcn,Lx,Ly,Lxx,Lxy,Lyy,Lxxx,Lxxy,Lxyy,Lyyy,discgaussder1D_L1norm,samplgaussder1D_L1norm,normsamplgaussder1D_L1norm,intgaussder1D_L1norm,linintgaussder1D_L1norm,normgaussder1D_L1norm,x,y,xv,yv,mean1D,variance1D,RGB2LUV,RGB2L,detHessian
+
+[TYPECHECK]
+ignored-modules=numpy,torch,scipy.special
+ignored-classes=numpy,torch,scipy.special
