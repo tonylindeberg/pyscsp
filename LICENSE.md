@@ -1,3 +1,5 @@
+Copyright (2023) Tony Lindeberg
+
 This code is shared under Creative Commons Attribution 4.0 license, see https://creativecommons.org/licenses/by/4.0/.
 
 If the code is used for publications, then please give appropriate credit to the scientific publications that the code is based on.
