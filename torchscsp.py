@@ -1,21 +1,6 @@
-"""Extensions of parts of the discscsp package to PyTorch networks
-"""
-
-import numpy as np
-import math
-from math import pi
-from typing import Union
-import torch
-
-from pyscsp.discscsp import gaussfiltsize, variance1D
-
-# ==>> Import from other Python package awaiting a full PyTorch interface for
-# ==>> the modified Bessel functions that determine the filter coefficients
-# ==>> for the discrete analogue of the Gaussian kernel
-from pyscsp.discscsp import make1Ddiscgaussfilter
-
-
 """Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch
+
+Extends parts of the discscsp package to PyTorch networks.
 
 For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
@@ -26,7 +11,7 @@ discscsp and discscspders to Python.
 
 Note: The scale normalization does not explicitly compensate for the additional 
 variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
-for the linearly integrated Gaussian kernel.
+for the linearly integrated Gaussian kernel at coarser scales.
 
 References:
 
@@ -43,10 +28,23 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 """
 
+import math
+from math import pi
+from typing import Union
+import numpy as np
+import torch
+
+from pyscsp.discscsp import gaussfiltsize, variance1D
+
+# ==>> Import from other Python package awaiting a full PyTorch interface for
+# ==>> the modified Bessel functions that determine the filter coefficients
+# ==>> for the discrete analogue of the Gaussian kernel
+from pyscsp.discscsp import make1Ddiscgaussfilter
+
 
 def make1Dgaussfilter(
         # sigma should be a 0-D PyTorch tensor if sigma is to be learned
-        sigma : Union[float, torch.Tensor], 
+        sigma : Union[float, torch.Tensor],
         scspmethod : str = 'discgauss',
         epsilon : float = 0.01, #
         D : int = 1
@@ -107,29 +105,39 @@ Pattern Analysis and Machine Intelligence, 12(3): 234--254.
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 """
-    if (scspmethod == 'samplgauss'):
-        return make1Dsamplgaussfilter(sigma, epsilon, D)
-    if (scspmethod == 'normsamplgauss'):
-        return make1Dnormsamplgaussfilter(sigma, epsilon, D)
-    elif (scspmethod == 'discgauss'):
+    if scspmethod == 'discgauss':
         # ==>> Note! Here sigma is not PyTorch variable to allow for scale
         # ==>> adaptation by backprop. That would need a PyTorch interface
         # ==>> for the modified Bessel functions
         return torch.from_numpy(\
                make1Ddiscgaussfilter(sigma, epsilon, D)).type(torch.FloatTensor)
-    elif (scspmethod == 'intgauss'):
+
+    if scspmethod == 'samplgauss':
+        return make1Dsamplgaussfilter(sigma, epsilon, D)
+
+    if scspmethod == 'normsamplgauss':
+        return make1Dnormsamplgaussfilter(sigma, epsilon, D)
+
+    if scspmethod == 'intgauss':
         return make1Dintgaussfilter(sigma, epsilon, D)
-    elif (scspmethod == 'linintgauss'):
+
+    if scspmethod == 'linintgauss':
         return make1Dlinintgaussfilter(sigma, epsilon, D)
-    else:
-        raise ValueError('Scale space method %s not implemented' % scspmethod)
- 
-    
+
+    raise ValueError(f'Scale space method {scspmethod} not implemented')
+
+
 def make1Dsamplgaussfilter(
         sigma : Union[float, torch.Tensor],
         epsilon : float = 0.01,
         D : int = 1
 ) -> torch.Tensor :
+    """Computes a 1D filter for separable discrete filtering with the 
+sampled Gaussian kernel.
+
+Note: At very fine scales, the variance of the discrete filter may be much lower 
+than sigma^2.
+"""
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     return gauss(x, sigma)
@@ -139,6 +147,8 @@ def gauss(
         x : torch.Tensor,
         sigma : float = 1.0
 ) -> torch.Tensor :
+    """Computes the 1-D Gaussian of a PyTorch tensor representing 1-D x-coordinates.
+"""
     return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)))
 
 
@@ -147,6 +157,12 @@ def make1Dnormsamplgaussfilter(
         epsilon : float = 0.01,
         D : int = 1
 ) -> torch.Tensor :
+    """Computes a 1D filter for separable discrete filtering with the L1-normalized 
+sampled Gaussian kernel.
+
+Note: At very fine scales, the variance of the discrete filter may be much lower
+than sigma^2.
+"""
     prelfilter = make1Dsamplgaussfilter(sigma, epsilon, D)
     return prelfilter/torch.sum(prelfilter)
 
@@ -156,8 +172,12 @@ def make1Dintgaussfilter(
         epsilon : float = 0.01,
         D : int = 1
 ) -> torch.Tensor :
-    # Box integrated Gaussian kernel over each pixel support region
-    # Remark: Adds additional spatial variance 1/12 to the kernel
+    """Computes a 1D filter for separable discrete filtering with the box integrated 
+Gaussian kernel over each pixel support region, according to Equation (3.89) on 
+page 97 in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
+
+Note: Adds additional spatial variance 1/12 to the kernel at coarser scales.
+"""
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
     return scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
@@ -167,6 +187,9 @@ def scaled_erf(
         z : torch.Tensor,
         sigma : float = 1.0
 ) -> torch.Tensor :
+    """Computes the scaled error function (as depending on a scale parameter sigma)
+of a PyTorch tensor representing 1-D x-coordinates.
+"""
     return 1/2*(1 + torch.erf(z/(math.sqrt(2)*sigma)))
 
 
@@ -175,12 +198,16 @@ def make1Dlinintgaussfilter(
         epsilon : float = 0.01,
         D : int = 1
 ) -> torch.Tensor :
-    # Linearly integrated Gaussian kernel over each extended pixel support region 
-    # Remark: Adds additional spatial variance 1/6 to the kernel
+    """Computes a 1D filter for separable discrete filtering with the linearly 
+integrated Gaussian kernel over each extended pixel support region.
+
+Note: Adds additional spatial variance 1/6 to the kernel at coarser scales.
+"""
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
+
     # The following equation is the result of a closed form integration of
-    # the expression for the filter coefficients in Eq (3.80) on page 97
+    # the expression for the filter coefficients in Eq (3.90) on page 97
     # in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer
     return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + \
            x_scaled_erf(x - 1, sigma) + \
@@ -192,6 +219,9 @@ def x_scaled_erf(
         x : torch.Tensor,
         sigma : float = 1.0
 ) -> torch.Tensor :
+    """Computes the product of the x-coordinate and scaled error function (as depending 
+on a scale parameter sigma) of a PyTorch tensor representing 1-D x-coordinates.
+"""
     return x * scaled_erf(x, sigma)
 
 
@@ -203,44 +233,63 @@ networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 
 using variance-based normalization of the Gaussian derivative operators 
 for scale normalization parameter gamma = 1.
+
+Note: This function is a mere template for how to compute the Gaussian derivative
+layer. For efficiency reasons, it may be better to generate the masks as PyTorch
+tensor only once in the Gaussian derivative layer, and then combining those at
+each call of a Gaussian derivative layer.
 """
     return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + \
            sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
 
 
 def dxmask():
+    """Returns a mask for discrete approximation of the first-order derivative 
+in the x-direction.
+"""
     return torch.from_numpy(np.array([[ 0.0, 0.0,  0.0], \
                                       [-0.5, 0.0, +0.5], \
                                       [ 0.0, 0.0,  0.0]]))
 
 
 def dymask():
+    """Returns a mask for discrete approximation of the first-order derivative 
+in the y-direction.
+"""
     return torch.from_numpy(np.array([[0.0, +0.5, 0.0], \
                                       [0.0,  0.0, 0.0], \
                                       [0.0, -0.5, 0.0]]))
 
 
 def dxxmask():
+    """Returns a mask for discrete approximation of the second-order derivative 
+in the x-direction.
+"""
     return torch.from_numpy(np.array([[0.0,  0.0, 0.0], \
                                       [1.0, -2.0, 1.0], \
                                       [0.0,  0.0, 0.0]]))
 
 
 def dxymask():
+    """Returns a mask for discrete apåproximation of the mixed second-order 
+derivative in the x- and y-directions.
+"""
+
     return torch.from_numpy(np.array([[-0.25, 0.00, +0.25], \
                                       [ 0.00, 0.00,  0.00], \
                                       [+0.25, 0.00, -0.25]]))
 
 
 def dyymask():
+    """Returns a mask for discrete approximation of the second-order derivative 
+in the y-direction.
+"""
     return torch.from_numpy(np.array([[0.0, +1.0, 0.0], \
                                       [0.0, -2.0, 0.0], \
                                       [0.0, +1.0, 0.0]]))
 
 
-def filtersdev(filter : torch.tensor) -> float :
+def filtersdev(pytorchfilter : torch.tensor) -> float :
     """Returns the actual spatial standard deviation of a 1-D PyTorch filter
 """
-    return math.sqrt(variance1D(filter.numpy()))
-
-    
+    return math.sqrt(variance1D(pytorchfilter.numpy()))
