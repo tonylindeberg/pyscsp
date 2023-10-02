@@ -46,7 +46,7 @@ def make1Dgaussfilter(
         # sigma should be a 0-D PyTorch tensor if sigma is to be learned
         sigma : Union[float, torch.Tensor],
         scspmethod : str = 'discgauss',
-        epsilon : float = 0.01, #
+        epsilon : float = 0.01,
         D : int = 1
 ) -> torch.Tensor :
     """Generates a mask for discrete approximation of the Gaussian kernel 
