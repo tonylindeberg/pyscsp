@@ -18,7 +18,7 @@ This package comprises:
     (blob detection or corner detection) and ridge detection.
 	
 For examples of how to apply these functions for computing scale-space
-features, please see the enclosed Jupyter notebook discscspdemo.ipynb.
+features, please see the enclosed Jupyter notebook [discscspdemo.ipynb](/discscspdemo.ipynb).
 
 For more technical descriptions about the respective functions, as well
 as explanations of the theoretical properties for different discrete
