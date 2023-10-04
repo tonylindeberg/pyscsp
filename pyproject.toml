@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "pytempscsp"
+name = "pyscsp"
 version = "0.9.1"
-description = "Temporal Scale-Space Toolbox for Python."
+description = "Scale-Space Toolbox for Python."
 authors = ["Tony Lindeberg <tony@kth.se>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/tonylindeberg/pytempscsp"
+repository = "https://github.com/tonylindeberg/pyscsp"
 
 [tool.poetry.dependencies]
 python = "^3.7"
