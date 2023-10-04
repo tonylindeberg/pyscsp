@@ -51,7 +51,6 @@ from scipy.ndimage import correlate1d, correlate
 from scipy.special import ive, erf, erfcinv
 
 
-# Object for storing the parameters of a scale-space discretization method
 class ScSpMethod(NamedTuple):
     """Object for storing the parameters of a scale-space discretization method, 
     which can be of either of the types  'discgauss', 'samplgauss', 'normsamplgauss', 
