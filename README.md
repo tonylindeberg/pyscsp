@@ -18,7 +18,7 @@ This package comprises:
 	
 For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
-[discscspdemo.ipynb](./tempscspdemo.ipynb).
+[discscspdemo.ipynb](./discscspdemo.ipynb).
 
 
 For more technical descriptions about the respective functions, as well
