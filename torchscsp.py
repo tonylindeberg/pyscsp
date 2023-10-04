@@ -230,26 +230,27 @@ def x_scaled_erf(
 
 def jet2mask(C0=0.0, Cx=0.0, Cy=0.0, Cxx=0.0, Cxy=0.0, Cyy=0.0, sigma=1.0):
     """Returns a discrete mask for a Gaussian derivative layer according to
+    Equation (11) in
 
-Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
-networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
+    Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
+    networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 
-using variance-based normalization of the Gaussian derivative operators 
-for scale normalization parameter gamma = 1.
+    using variance-based normalization of the Gaussian derivative operators 
+    for scale normalization parameter gamma = 1.
 
-Note: This function is a mere template for how to compute the Gaussian derivative
-layer. For efficiency reasons, it may be better to generate the masks as PyTorch
-tensor only once in the Gaussian derivative layer, and then combining those at
-each call of a Gaussian derivative layer.
-"""
+    Note: This function is a mere template for how to compute the Gaussian derivative
+    layer. For efficiency reasons, it may be better to generate the masks as PyTorch
+    tensor only once in the Gaussian derivative layer, and then combining those at
+    each call of a Gaussian derivative layer.
+    """
     return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + \
            sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
 
 
 def dxmask():
     """Returns a mask for discrete approximation of the first-order derivative 
-in the x-direction.
-"""
+    in the x-direction.
+    """
     return torch.from_numpy(np.array([[ 0.0, 0.0,  0.0], \
                                       [-0.5, 0.0, +0.5], \
                                       [ 0.0, 0.0,  0.0]]))
@@ -257,8 +258,8 @@ in the x-direction.
 
 def dymask():
     """Returns a mask for discrete approximation of the first-order derivative 
-in the y-direction.
-"""
+    in the y-direction.
+    """
     return torch.from_numpy(np.array([[0.0, +0.5, 0.0], \
                                       [0.0,  0.0, 0.0], \
                                       [0.0, -0.5, 0.0]]))
@@ -266,8 +267,8 @@ in the y-direction.
 
 def dxxmask():
     """Returns a mask for discrete approximation of the second-order derivative 
-in the x-direction.
-"""
+    in the x-direction.
+    """
     return torch.from_numpy(np.array([[0.0,  0.0, 0.0], \
                                       [1.0, -2.0, 1.0], \
                                       [0.0,  0.0, 0.0]]))
@@ -275,8 +276,8 @@ in the x-direction.
 
 def dxymask():
     """Returns a mask for discrete approximation of the mixed second-order 
-derivative in the x- and y-directions.
-"""
+    derivative in the x- and y-directions.
+    """
 
     return torch.from_numpy(np.array([[-0.25, 0.00, +0.25], \
                                       [ 0.00, 0.00,  0.00], \
@@ -285,8 +286,8 @@ derivative in the x- and y-directions.
 
 def dyymask():
     """Returns a mask for discrete approximation of the second-order derivative 
-in the y-direction.
-"""
+    in the y-direction.
+    """
     return torch.from_numpy(np.array([[0.0, +1.0, 0.0], \
                                       [0.0, -2.0, 0.0], \
                                       [0.0, +1.0, 0.0]]))
@@ -294,5 +295,5 @@ in the y-direction.
 
 def filtersdev(pytorchfilter : torch.tensor) -> float :
     """Returns the actual spatial standard deviation of a 1-D PyTorch filter
-"""
+    """
     return math.sqrt(variance1D(pytorchfilter.numpy()))
