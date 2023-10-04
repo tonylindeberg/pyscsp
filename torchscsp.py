@@ -50,61 +50,61 @@ def make1Dgaussfilter(
         D : int = 1
 ) -> torch.Tensor :
     """Generates a mask for discrete approximation of the Gaussian kernel 
-by separable filtering, using either of the methods:
+    by separable filtering, using either of the methods:
 
-  'discgauss' - the discrete analogue of the Gaussian kernel
-  'samplgauss' - the sampled Gaussian kernel
-  'normsamplgauss' - the sampled Gaussian kernel
-  'intgauss' - the integrated Gaussian kernel
-  'linintgauss' - the linearily integrated Gaussian kernel
+      'discgauss' - the discrete analogue of the Gaussian kernel
+      'samplgauss' - the sampled Gaussian kernel
+      'normsamplgauss' - the sampled Gaussian kernel
+      'intgauss' - the integrated Gaussian kernel
+      'linintgauss' - the linearily integrated Gaussian kernel
 
-The discrete analogue of the Gaussian kernel has the best theoretical properties 
-of these kernels, in the sense that it obeys both (i) non-enhancement of local 
-extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
-any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
-are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
-for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
-kernel is also equal to the sigma value. The current implementation of the this filter 
-in terms of modified Bessel functions of integer order is, however, not 
-supported in terms of existing PyTorch functions, implying that the choice 
-of this method will not allow for scale adaptation by backprop.
+    The discrete analogue of the Gaussian kernel has the best theoretical properties 
+    of these kernels, in the sense that it obeys both (i) non-enhancement of local 
+    extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
+    any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
+    are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
+    for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
+    kernel is also equal to the sigma value. The current implementation of the this filter 
+    in terms of modified Bessel functions of integer order is, however, not 
+    supported in terms of existing PyTorch functions, implying that the choice 
+    of this method will not allow for scale adaptation by backprop.
 
-For this reason, the alternative methods 'samplgauss', 'normsamplgauss, 'intgauss' 
-and 'linintgauss' are provided, with full implementations in terms of PyTorch
-functions and thereby supporting scale adaptation by backprop.
+    For this reason, the alternative methods 'samplgauss', 'normsamplgauss, 'intgauss' 
+    and 'linintgauss' are provided, with full implementations in terms of PyTorch
+    functions and thereby supporting scale adaptation by backprop.
 
-For these methods, there are the possible advantages (+) and disadvantages (-):
+    For these methods, there are the possible advantages (+) and disadvantages (-):
 
-  'samplgauss' + no added scale offset in the spatial discretization
-               - the kernel values may become greater than 1 for small values of sigma
-               - the kernel values do not sum up to one
-               - for very small values of sigma the kernels have too narrow shape
+    'samplgauss' + no added scale offset in the spatial discretization
+                 - the kernel values may become greater than 1 for small values of sigma
+                 - the kernel values do not sum up to one
+                 - for very small values of sigma the kernels have too narrow shape
 
-  'normsamplgauss' + no added scale offset in the spatial discretization
-                   + formally the kernel values are guaranteed to be in the 
-                     interval [0, 1]
-                   + formally the kernel values are guaranteed to sum up to 1 
-                   - the complementary normalization of the kernel is ad hoc
-                   - for very small values of sigma the kernels have too narrow shape
+    'normsamplgauss' + no added scale offset in the spatial discretization
+                     + formally the kernel values are guaranteed to be in the 
+                       interval [0, 1]
+                     + formally the kernel values are guaranteed to sum up to 1 
+                     - the complementary normalization of the kernel is ad hoc
+                     - for very small values of sigma the kernels have too narrow shape
 
-  'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
-             + the kernel values are guaranteed to sum up to 1 over an infinite domain
-             - the box integration introduces a scale offset of 1/12 at coarser scales
+    'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+               + the kernel values are guaranteed to sum up to 1 over an infinite domain
+               - the box integration introduces a scale offset of 1/12 at coarser scales
 
-  'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
-                - the triangular window integration introduces a scale offset 
-                  of 1/6 at coarser scales
+    'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+                  - the triangular window integration introduces a scale offset 
+                    of 1/6 at coarser scales
 
-The parameter epsilon specifies an upper bound on the relative truncation error
-for separable filtering over a D-dimensional domain.
+    The parameter epsilon specifies an upper bound on the relative truncation error
+    for separable filtering over a D-dimensional domain.
           
-References:
+    References:
 
-Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+    Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+    Pattern Analysis and Machine Intelligence, 12(3): 234--254.
 
-Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
-"""
+    Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+    """
     if scspmethod == 'discgauss':
         # ==>> Note! Here sigma is not PyTorch variable to allow for scale
         # ==>> adaptation by backprop. That would need a PyTorch interface
@@ -133,13 +133,14 @@ def make1Dsamplgaussfilter(
         D : int = 1
 ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the 
-sampled Gaussian kernel.
+    sampled Gaussian kernel.
 
-Note: At very fine scales, the variance of the discrete filter may be much lower 
-than sigma^2.
-"""
+    Note: At very fine scales, the variance of the discrete filter may be much 
+    lower than sigma^2.
+    """
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
+
     return gauss(x, sigma)
 
 
@@ -148,7 +149,7 @@ def gauss(
         sigma : float = 1.0
 ) -> torch.Tensor :
     """Computes the 1-D Gaussian of a PyTorch tensor representing 1-D x-coordinates.
-"""
+    """
     return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)))
 
 
@@ -158,12 +159,13 @@ def make1Dnormsamplgaussfilter(
         D : int = 1
 ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the L1-normalized 
-sampled Gaussian kernel.
+    sampled Gaussian kernel.
 
-Note: At very fine scales, the variance of the discrete filter may be much lower
-than sigma^2.
-"""
+    Note: At very fine scales, the variance of the discrete filter may be much lower
+    than sigma^2.
+    """
     prelfilter = make1Dsamplgaussfilter(sigma, epsilon, D)
+
     return prelfilter/torch.sum(prelfilter)
 
 
@@ -173,13 +175,14 @@ def make1Dintgaussfilter(
         D : int = 1
 ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the box integrated 
-Gaussian kernel over each pixel support region, according to Equation (3.89) on 
-page 97 in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
+    Gaussian kernel over each pixel support region, according to Equation (3.89) on 
+    page 97 in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
 
-Note: Adds additional spatial variance 1/12 to the kernel at coarser scales.
-"""
+    Note: Adds additional spatial variance 1/12 to the kernel at coarser scales.
+    """
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
+
     return scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
 
 
@@ -188,8 +191,8 @@ def scaled_erf(
         sigma : float = 1.0
 ) -> torch.Tensor :
     """Computes the scaled error function (as depending on a scale parameter sigma)
-of a PyTorch tensor representing 1-D x-coordinates.
-"""
+    of a PyTorch tensor representing 1-D x-coordinates.
+    """
     return 1/2*(1 + torch.erf(z/(math.sqrt(2)*sigma)))
 
 
@@ -199,10 +202,10 @@ def make1Dlinintgaussfilter(
         D : int = 1
 ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the linearly 
-integrated Gaussian kernel over each extended pixel support region.
+    integrated Gaussian kernel over each extended pixel support region.
 
-Note: Adds additional spatial variance 1/6 to the kernel at coarser scales.
-"""
+    Note: Adds additional spatial variance 1/6 to the kernel at coarser scales.
+    """
     vecsize = int((math.ceil(1.0*gaussfiltsize(sigma, epsilon, D))))
     x = torch.linspace(-vecsize, vecsize, 2*vecsize+1)
 
@@ -220,8 +223,8 @@ def x_scaled_erf(
         sigma : float = 1.0
 ) -> torch.Tensor :
     """Computes the product of the x-coordinate and scaled error function (as depending 
-on a scale parameter sigma) of a PyTorch tensor representing 1-D x-coordinates.
-"""
+    on a scale parameter sigma) of a PyTorch tensor representing 1-D x-coordinates.
+    """
     return x * scaled_erf(x, sigma)
 
 
