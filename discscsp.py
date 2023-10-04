@@ -620,7 +620,7 @@ def make1Dlinintgaussfilter(
     x = np.linspace(-vecsize, vecsize, 1+2*vecsize)
 
     # The following equation is the result of a closed form integration of
-    # the expression for the filter coefficients in Eq (3.90) on pag 97
+    # the expression for the filter coefficients in Eq (3.90) on page 97
     # in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
     return x_scaled_erf(x + 1, sigma) - 2*x_scaled_erf(x, sigma) + \
            x_scaled_erf(x - 1, sigma) + \
