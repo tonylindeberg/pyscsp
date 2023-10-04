@@ -4,6 +4,7 @@
 # Distribution/Packaging
 .env
 .venv
+dist/
 env/
 venv/
 wheels/
