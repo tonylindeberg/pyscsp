@@ -271,7 +271,7 @@ in the x-direction.
 
 
 def dxymask():
-    """Returns a mask for discrete apåproximation of the mixed second-order 
+    """Returns a mask for discrete approximation of the mixed second-order 
 derivative in the x- and y-directions.
 """
 
