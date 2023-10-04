@@ -1,4 +1,4 @@
-# pyscsp : Scale-Space Toolbox in Python
+# pyscsp : Scale-Space Toolbox for Python
 
 Contains the following subpackages:
 
