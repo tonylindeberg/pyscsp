@@ -35,6 +35,16 @@ strings for the respective functions in the source code in discscsp.py.
 -- discrete derivative approximation masks for computing discrete approximations
      of Gaussian derivatives and Gaussian derivative layers in PyTorch.
 
+## Installation
+
+This package is available 
+through pip and can installed by
+
+```bash
+pip install pyscsp
+```
+
+
 ## References:
 
 Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
