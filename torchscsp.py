@@ -240,8 +240,8 @@ def jet2mask(C0=0.0, Cx=0.0, Cy=0.0, Cxx=0.0, Cxy=0.0, Cyy=0.0, sigma=1.0):
 
     Note: This function is a mere template for how to compute the Gaussian derivative
     layer. For efficiency reasons, it may be better to generate the masks as PyTorch
-    tensor only once in the Gaussian derivative layer, and then combining those at
-    each call of a Gaussian derivative layer.
+    tensors only once and for all in the Gaussian derivative layer, and then combining 
+    those at each new call of a Gaussian derivative layer.
     """
     return C0 + sigma*(Cx*dxmask() + Cy*dymask()) + \
            sigma**2/2*(Cxx*dxxmask() + Cxy*dxymask() + Cyy*dyymask())
