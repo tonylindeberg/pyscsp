@@ -1,4 +1,4 @@
-# pyscsp : Scale-space functions in Python
+# pyscsp : Scale-Space Toolbox in Python
 
 Contains the following subpackages:
 
@@ -18,7 +18,8 @@ This package comprises:
 	
 For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
-[discscspdemo.ipynb](./discscspdemo.ipynb).
+[discsc
+spdemo.ipynb](./discscspdemo.ipynb).
 
 
 For more technical descriptions about the respective functions, as well
