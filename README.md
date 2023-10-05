@@ -28,9 +28,6 @@ strings for the respective functions in the source code in discscsp.py.
 
 ## torchscsp.py: Subset of functionalities for use in PyTorch:
 
-Note: To avoid the dependency on PyTorch, this package is meanwhile
-not contained in the PyPi distribution, only at GitHub.
-
 -- functions for generating 1-D discrete approximations of the Gaussian kernel
      for spatial smoothing with separable filtering in PyTorch.
 	 
@@ -39,11 +36,19 @@ not contained in the PyPi distribution, only at GitHub.
 
 ## Installation
 
-This package is available 
+The discscsp subpackage part of this package, which only requires a
+lightweight installation, is available 
 through pip and can installed by
 
 ```bash
 pip install pyscsp
+```
+
+The torchscsp subpackage, which requires a larger installation of
+PyTorch, is available at GitHub
+
+```bash
+git clone git@github.com:tonylindeberg/pyscsp.git
 ```
 
 
