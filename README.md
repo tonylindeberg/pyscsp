@@ -45,7 +45,7 @@ pip install pyscsp
 ```
 
 The torchscsp subpackage, which requires a larger installation of
-PyTorch, is available at GitHub
+PyTorch, can be downloaded from GitHub:
 
 ```bash
 git clone git@github.com:tonylindeberg/pyscsp.git
