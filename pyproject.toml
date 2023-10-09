@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyscsp"
-version = "0.9.4"
+version = "0.9.5"
 description = "Scale-Space Toolbox for Python."
 authors = ["Tony Lindeberg <tony@kth.se>"]
 license = "MIT"
@@ -10,7 +10,6 @@ repository = "https://github.com/tonylindeberg/pyscsp"
 [tool.poetry.dependencies]
 python="^3.7"
 scipy="^1.0.1"
-torch="^1.0.1"
 
 [build-system]
 requires = ["poetry-core"]
