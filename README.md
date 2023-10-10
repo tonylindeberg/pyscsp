@@ -40,17 +40,18 @@ These modules can be installed using pip.
 
 To install only the discscsp module (without installing the torchscsp module which requires a larger
 installation of PyTorch) do:
-
 ```bash
 pip install pyscsp
 ```
 
 To install also the torchscsp module, instead perform the
 following command:
-
 ```bash
 pip install 'pyscsp[torch]'
 ```
+Note, however, that you must have PyTorch already installed to use
+this option. Otherwise, the installation command will generate an
+error message.
 
 These modules can also be downloaded directly from GitHub:
 
