@@ -36,16 +36,24 @@ strings for the respective functions in the source code in discscsp.py.
 
 ## Installation
 
-The discscsp subpackage part of this package, which only requires a
-lightweight installation, is available 
-through pip and can installed by
+These packages can be installed using pip.
+
+To install only the discscsp subpackage part of this package 
+(without installing the torchscsp subpackage which requires a larger
+installation of PyTorch) do:
 
 ```bash
 pip install pyscsp
 ```
 
-The torchscsp subpackage, which requires a larger installation of
-PyTorch, can be downloaded from GitHub:
+To install also the torchscsp subpackage, do instead perform the
+following command:
+
+```bash
+pip install 'pyscsp[torch]'
+```
+
+These packages can also be downloaded directly from GitHub:
 
 ```bash
 git clone git@github.com:tonylindeberg/pyscsp.git
