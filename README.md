@@ -2,7 +2,7 @@
 
 Contains the following modules:
 
-## discscsp: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
+## discscsp: Discrete Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This module comprises:
 
