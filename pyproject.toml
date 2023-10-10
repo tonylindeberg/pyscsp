@@ -11,6 +11,9 @@ repository = "https://github.com/tonylindeberg/pyscsp"
 python="^3.7"
 scipy="^1.0.1"
 
+[project.optional-dependencies]
+torch = ["torch="^1.0.1"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
