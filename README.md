@@ -44,12 +44,12 @@ installation of PyTorch) do:
 pip install pyscsp
 ```
 
-To install also the torchscsp module, instead perform the
+To install also the torchscsp module, do instead perform the
 following command:
 ```bash
 pip install 'pyscsp[torch]'
 ```
-Note, however, that you must have PyTorch already installed to use
+Note, however, that you must have then PyTorch already installed to use
 this option. Otherwise, the installation command will generate an
 error message.
 
