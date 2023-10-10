@@ -7,5 +7,5 @@ try:
 except ImportError:
     warnings.warn(
       "PyTorch is not installed. Therefore torchscsp cannot be imported."
-      "Please install the torch package to use it.    
+      "Please install the torch package to use it."
     )
