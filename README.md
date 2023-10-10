@@ -49,7 +49,7 @@ following command:
 ```bash
 pip install 'pyscsp[torch]'
 ```
-Note, however, that you must have then PyTorch already installed to use
+Note, however, that you must then have PyTorch already installed to use
 this option. Otherwise, the installation command will generate an
 error message.
 
