@@ -1,10 +1,10 @@
 # pyscsp : Scale-Space Toolbox for Python
 
-Contains the following subpackages:
+Contains the following modules:
 
-## discscsp.py: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
+## discscsp: Discrete Scale Space and Scale-Space Derivative Toolbox for Python:
 
-This package comprises:
+This module comprises:
 
 -- functions for computing spatial scale-space representations by spatial smoothing 
      with the discrete analogue of the Gaussian kernel or other discrete approximations 
@@ -26,7 +26,7 @@ as explanations of the theoretical properties for different discrete
 approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in discscsp.py.
 
-## torchscsp.py: Subset of functionalities for use in PyTorch:
+## torchscsp: Subset of functionalities for use in PyTorch:
 
 -- functions for generating 1-D discrete approximations of the Gaussian kernel
      for spatial smoothing with separable filtering in PyTorch.
@@ -36,24 +36,23 @@ strings for the respective functions in the source code in discscsp.py.
 
 ## Installation
 
-These packages can be installed using pip.
+These modules can be installed using pip.
 
-To install only the discscsp subpackage part of this package 
-(without installing the torchscsp subpackage which requires a larger
+To install only the discscsp module (without installing the torchscsp module which requires a larger
 installation of PyTorch) do:
 
 ```bash
 pip install pyscsp
 ```
 
-To install also the torchscsp subpackage, do instead perform the
+To install also the torchscsp module, instead perform the
 following command:
 
 ```bash
 pip install 'pyscsp[torch]'
 ```
 
-These packages can also be downloaded directly from GitHub:
+These modules can also be downloaded directly from GitHub:
 
 ```bash
 git clone git@github.com:tonylindeberg/pyscsp.git
