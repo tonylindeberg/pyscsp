@@ -18,7 +18,8 @@ This module comprises:
 	
 For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
-[discscspdemo.ipynb](./discscspdemo.ipynb).
+[discscspdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/discscspdemo.ipynb).
+
 
 
 For more technical descriptions about the respective functions, as well
