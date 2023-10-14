@@ -8,7 +8,7 @@ This module comprises:
 
 -- functions for computing spatial scale-space representations by spatial smoothing 
      with the discrete analogue of the Gaussian kernel or other discrete approximations 
-	 of the continuous Gaussian kernel that is used for defining a Gaussian 
+	 of the continuous Gaussian kernel, that is used for defining a Gaussian 
 	 scale-space representation.
 
 -- functions for computing differential expressions in terms of scale-normalized
@@ -87,8 +87,8 @@ Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 ([preprint](https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409))
 
-Lindeberg (2015) ``Image matching using generalized scale-space
-interest points'', Journal of Mathematical Imaging and Vision, 52(1):
+Lindeberg (2015) "Image matching using generalized scale-space
+interest points", Journal of Mathematical Imaging and Vision, 52(1):
 3-36
 ([Open Access](https://dx.doi.org/10.1007/s10851-014-0541-0))
 
