@@ -44,7 +44,7 @@ in the following ways:
 - there is no passing of additional parameters to functions of the N-jet
 - this reimplementation has not yet been thoroughly tested
 """
-from math import sqrt, exp, ceil, pi
+from math import sqrt, exp, ceil, pi, cos, sin
 from typing import NamedTuple, Union, List
 import numpy as np
 from scipy.ndimage import correlate1d, correlate
@@ -701,15 +701,15 @@ def deltafcn(xsize : int, ysize : int) -> np.ndarray :
 
 
 def dxmask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the first-order derivative 
-    in the x-direction.
+    """Defines a (minimal) mask for discrete approximation of the first-order 
+    derivative in the x-direction.
     """
     return np.array([[-1/2, 0, 1/2]])
 
 
 def dymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the first-order derivative 
-    in the y-direction.
+    """Defines a (minimal) mask for discrete approximation of the first-order 
+    derivative in the y-direction.
     """
     return np.array([[+1/2], \
                      [   0], \
@@ -717,14 +717,14 @@ def dymask() -> np.ndarray :
 
 
 def dxxmask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the second-order derivative 
-    in the x-direction.
+    """Defines a (minimal) mask for discrete approximation of the second-order 
+    derivative in the x-direction.
     """
     return np.array([[1, -2, 1]])
 
 
 def dxymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed second-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed second-order 
     derivative in the x- and y-directions.
     """
     return np.array([[-1/4, 0, +1/4], \
@@ -733,8 +733,8 @@ def dxymask() -> np.ndarray :
 
 
 def dyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the second-order derivative 
-    in the y-direction.
+    """Defines a (minimal) mask for discrete approximation of the second-order 
+    derivative in the y-direction.
     """
     return np.array([[+1], \
                      [-2], \
@@ -742,14 +742,14 @@ def dyymask() -> np.ndarray :
 
 
 def dxxxmask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the third-order derivative 
-    in the x-direction.
+    """Defines a (minimal) mask for discrete approximation of the third-order 
+    derivative in the x-direction.
     """
     return np.array([[-1/2, 1, 0, -1, 1/2]])
 
 
 def dxxymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed third-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed third-order 
     derivative corresponding to a second-order derivative in the x-direction 
     and a first-order derivative in the y-direction.
     """
@@ -759,7 +759,7 @@ def dxxymask() -> np.ndarray :
 
 
 def dxyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed third-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed third-order 
     derivative corresponding to a first-order derivative in the x-direction 
     and a second-order derivative in the y-direction.
     """
@@ -769,7 +769,7 @@ def dxyymask() -> np.ndarray :
 
 
 def dyyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the third-order derivative 
+    """Defines a (minimal) mask for discrete approximation of the third-order derivative 
     in the y-direction.
     """
     return np.array([[+1/2], \
@@ -780,14 +780,14 @@ def dyyymask() -> np.ndarray :
 
 
 def dxxxxmask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the fourth-order derivative 
+    """Defines a (minimal) mask for discrete approximation of the fourth-order derivative 
     in the x-direction.
     """
     return np.array([[1, -4, 6, -4, 1]])
 
 
 def dxxxymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed fourth-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed fourth-order 
     derivative corresponding to a third-order derivative in the x-direction and 
     a first-order derivative in the y-direction.
     """
@@ -797,7 +797,7 @@ def dxxxymask() -> np.ndarray :
 
 
 def dxxyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed fourth-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed fourth-order 
     derivative corresponding to a second-order derivatives in the x- and y-directions.
     """
     return np.array([[+1, -2, +1], \
@@ -806,7 +806,7 @@ def dxxyymask() -> np.ndarray :
 
 
 def dxyyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the mixed fourth-order 
+    """Defines a (minimal) mask for discrete approximation of the mixed fourth-order 
     derivative corresponding to a first-order derivative in the x-direction and 
     a third-order derivative in the y-direction.
     """
@@ -818,7 +818,7 @@ def dxyyymask() -> np.ndarray :
 
 
 def dyyyymask() -> np.ndarray :
-    """Defines a mask for discrete approximation of the fourth-order derivative 
+    """Defines a (minimal) mask for discrete approximation of the fourth-order derivative 
     in the y-direction.
     """
     return np.array([[+1], \
@@ -1631,3 +1631,186 @@ def RGB2L(inpic) -> np.ndarray:
     inpic = np.array(inpic).astype('float')
 
     return (inpic[:, :, 0] + inpic[:, :, 1] + inpic[:, :, 2])/3.0
+
+
+def applydirder(
+        smoothpic : np.ndarray,
+        phi : float,
+        orderphi : int,
+        orderorth : int,
+        sigma : float = 1.0,
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussvar') -> np.ndarray :
+    """Applies a directional derivative of order orderphi in the direction phi
+    and order orderorth in the orthogonal direction to the input image.
+
+    The directional operator is defined as
+
+    d_phi^orderphi d_orth^orderorth
+
+    for
+
+    d_phi  =  cos phi d_x + sin phi d_y
+    d_orth = -sin phi d_x + cos phi_dy
+
+    where d_x and d_y constitute discrete approximations to partial derivatives
+    along the x- and y-directions, respectively.
+
+    The intention is that if this operation is applied to image data, then
+    it should be preceeded by a call to the spatial smoothing operation,
+    as can be performed by e.g. the function scspconv(). If you want to
+    make use of scale-normalized derivatives, the parameter sigma should
+    then describe the value of the spatial scale parameter used for spatial
+    smoothing in units of the standard deviation of the kernel.
+
+    Note, however, that the computation of the scale normalization factor
+    for scale-normalized derivatives is only valid for variance-based
+    scale normalization. To perform Lp-normalization properly, a non-separable
+    2-D image filter would need to be computed, corresponding to the combined
+    effect of the discrete directional derivative approximation mask and
+    the spatial smoothing operation, which may consitute a significant
+    amount of computational work, compared to the actual work of performing
+    the linear filtering needed to apply the directional derivativce approximation
+    mask, and has not yet been immplemented.
+
+    References:
+
+    Lindeberg (1993) "Scale-Space Theory in Computer Vision", Springer.
+    (See Equation (5.54) on page 139.)
+
+    Lindeberg (2013) "A computational theory of visual receptive fields", 
+    Biological Cybernetics, 107(6): 589-635. (See Equation (69).)
+    """
+    mask = dirdermask(phi, orderphi, orderorth)
+
+    return normderfactor(orderphi, orderorth, sigma, normdermethod) * \
+           correlate(smoothpic, mask)
+
+
+def dirdermask(
+        phi : float,
+        orderphi : int,
+        orderorth : int) -> np.ndarray :
+    """Returns a directional derivative mask of order orderphi in the direction phi
+    and order orderorth in the orthogonal direction to an image.
+    """
+    if (orderphi == 1) and (orderorth == 0):
+        return dphi_mask(phi)
+    if (orderphi == 2) and (orderorth == 0):
+        return dphiphi_mask(phi)
+    if (orderphi == 0) and (orderorth == 1):
+        return dorth_mask(phi)
+    if (orderphi == 0) and (orderorth == 2):
+        return dorthorth_mask(phi)
+    if (orderphi == 1) and (orderorth == 1):
+        return dphiorth_mask(phi)
+    if (orderphi == 0) and (orderorth == 0):
+        return [[1]]
+
+    raise ValueError(f"Not implemented directional derivatives of order \
+                     (orderphi {orderphi}) and (orderorth {orderorth})")
+
+
+def dphi_mask(phi : float) -> np.ndarray :
+    """Defines a mask for discrete approximation of the first-order directional 
+    derivative in the orientation phi.
+
+    See Equation (5.54) on page 139 in Lindeberg (1993) 
+    "Scale-Space Theory in Computer Vision", Springer.
+    """
+    return cos(phi) * dxmask3() + sin(phi) * dymask3()
+
+
+def dphiphi_mask(phi : float) -> np.ndarray :
+    """Defines a mask for discrete approximation of the second-order directional 
+    derivative in the orientation phi.
+
+    See Equation (5.54) on page 139 in Lindeberg (1993) 
+    "Scale-Space Theory in Computer Vision", Springer.
+    """
+    return cos(phi)**2 * dxxmask3() + \
+           2*cos(phi)*sin(phi) * dxymask3() + \
+           sin(phi)**2 * dyymask3()
+
+
+def dorth_mask(phi : float) -> np.ndarray :
+    """Defines a mask for discrete approximation of the first-order directional 
+    derivative in a perpendicular orientation to phi.
+
+    See Equation (5.54) on page 139 in Lindeberg (1993) 
+    "Scale-Space Theory in Computer Vision", Springer,
+    and note that an orthogonal direction to the unit vector 
+    (cos phi, sin phi) is (-sin phi, cos phi).
+    """
+    return -sin(phi) * dxmask3() + cos(phi) * dymask3()
+
+
+def dorthorth_mask(phi : float) -> np.ndarray :
+    """Defines a mask for discrete approximation of the second-order directional 
+    derivative in a perpendicular orientation to phi.
+
+    See Equation (5.54) on page 139 in Lindeberg (1993) 
+    "Scale-Space Theory in Computer Vision", Springer,
+    and note that an orthogonal direction to the unit vector 
+    (cos phi, sin phi) is (-sin phi, cos phi).
+    """
+    return sin(phi)**2 * dxxmask3() \
+           - 2*cos(phi)*sin(phi) * dxymask3() \
+           + cos(phi)**2 * dyymask3()
+
+
+def dphiorth_mask(phi : float) -> np.ndarray :
+    """Defines a mask for discrete approximation of the mixed second-order directional 
+    derivative in the directions of phi and its perpendicular orientation.
+
+    See Equation (5.54) on page 139 in Lindeberg (1993) 
+    "Scale-Space Theory in Computer Vision", Springer,
+    and note that an orthogonal direction to the unit vector 
+    (cos phi, sin phi) is (-sin phi, cos phi).
+    """
+    return cos(phi)*sin(phi) * (dyymask3() - dxxmask3()) \
+           - (cos(phi)**2 - sin(phi)**2) * dxymask3()
+
+
+def dxmask3() -> np.ndarray :
+    """Defines a mask of size 3 x 3 for discrete approximation of the 
+    first-order derivative in the x-direction.
+    """
+    return np.array([[  0,  0,  0 ],
+                     [-1/2, 0, 1/2],
+                     [  0,  0,  0 ]])
+
+
+def dymask3() -> np.ndarray :
+    """Defines a mask of size 3 x 3 for discrete approximation of the 
+    first-order derivative in the y-direction.
+    """
+    return np.array([[0, +1/2, 0], \
+                     [0,   0,  0], \
+                     [0, -1/2, 0]])
+
+
+def dxxmask3() -> np.ndarray :
+    """Defines a mask of size 3 x 3 for discrete approximation of the 
+    second-order derivative in the x-direction.
+    """
+    return np.array([[0,  0,  0],
+                     [1, -2,  1],
+                     [0,  0,  0]])
+
+
+def dxymask3() -> np.ndarray :
+    """Defines a mask of size 3 x 3 for discrete approximation of the 
+    mixed second-order derivative in the x- and y-directions.
+    """
+    return np.array([[-1/4, 0, +1/4], \
+                     [   0, 0,    0], \
+                     [+1/4, 0, -1/4]])
+
+
+def dyymask3() -> np.ndarray :
+    """Defines a mask of size 3 x 3 for discrete approximation of the 
+    second-order derivative in the y-direction.
+    """
+    return np.array([[0, +1, 0], \
+                     [0, -2, 0], \
+                     [0, +1, 0]])
