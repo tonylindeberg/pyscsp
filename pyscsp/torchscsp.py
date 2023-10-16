@@ -41,7 +41,7 @@ from pyscsp.discscsp import gaussfiltsize, variance1D
 # ==>> for the discrete analogue of the Gaussian kernel
 from pyscsp.discscsp import make1Ddiscgaussfilter
 
-from pyscsp.affscsp import samplaffgausskernel, scnormdirdermask, L1normdirdermask
+from pyscsp.affscsp import samplaffgausskernel, scnormaffdirdermask, L1normaffdirdermask
 
 
 def make1Dgaussfilter(
@@ -309,7 +309,7 @@ def makesamplaffgausskernel(
     ) -> np.ndarray :
     """Computes a sampled affine Gaussian kernel of size N x N defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma*(-1) x/2)
 
     with the covariance matrix 
     
@@ -329,11 +329,11 @@ def makesamplaffgausskernel(
     Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
     of 3-D depth cues from affine distortions of local 2-D structure",
     Image and Vision Computing 15:415-434
-    """   
+    """
     return torch.from_numpy(samplaffgausskernel(sigma1, sigma2, phi, N))
 
 
-def makescnormdirdermask(
+def makescnormaffdirdermask(
     sigma1 : float,
     sigma2 : float,
     phi : float,
@@ -372,10 +372,10 @@ def makescnormdirdermask(
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
     return torch.from_numpy( \
-        scnormdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
+        scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
 
 
-def makeL1normdirdermask(
+def makeL1normaffdirdermask(
     sigma1 : float,
     sigma2 : float,
     phi : float,
@@ -416,5 +416,4 @@ def makeL1normdirdermask(
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
     return torch.from_numpy( \
-        L1normdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
-
+        L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder))

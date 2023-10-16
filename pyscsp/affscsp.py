@@ -1,9 +1,9 @@
 """ Affine Scale-Space Toolbox for Python
 
 For computing affine Gaussian kernels and affine Gaussian directional kernels, 
-as well as providing a computationally reasonably efficient way to compuyte 
+as well as providing a computationally reasonably efficient way to compute 
 filter banks of directional derivative responses over multiple image directions
-and orders of spatial differentiation.
+as well as orders of spatial differentiation.
 
 References:
 
@@ -11,7 +11,7 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
 Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
 of 3-D depth cues from affine distortions of local 2-D structure",
-Image and Vision Computing 15:415-434
+Image and Vision Computing 15: 415-434
 
 Lindeberg (2013) "A computational theory of visual receptive fields", 
 Biological Cybernetics, 107(6): 589-635. (See Equation (69).)
@@ -24,7 +24,7 @@ Relations between the scientific papers and concepts in this code:
 Chapter 14 in the book (Lindeberg 1993) and the article 
 (Lindeberg and Garding 1997) describe the notion of affine Gaussian
 scale space, with its closedness property under affine image
-transformations, referred to as affine covariance or equivariance.
+transformations, referred to as affine covariance or affine equivariance.
 
 The articles (Lindeberg 2013) and (Lindeberg 2021) demonstrate how
 the spatial component of the receptive fields of simple cells in
@@ -35,11 +35,10 @@ directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
 """
 
-from math import exp, pi, pow, sqrt, cos, sin
-from typing import Union, List
+from math import exp, pi, sqrt, cos, sin
 import numpy as np
 from scipy.ndimage import correlate
-from discscsp import dirdermask, normgaussder1D_L1norm
+from pyscsp.discscsp import dirdermask, normgaussder1D_L1norm
 
 
 def CxxCxyCyyfromlambda12phi(
@@ -118,7 +117,7 @@ def sampldirderaffgausskernelfromlambda12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn, 
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
 
     with the spatial covariance matrix 
     
@@ -148,7 +147,7 @@ def sampldirderaffgausskernelfromlambda12phi(
     # ported to Matlab by semi-automatic editing, and then further ported to
     # Python by another round of editing.
     # Therefore, some of the constructions may seem a bit odd ...
-    E = exp(1);
+    E = exp(1)
 
     if (phiorder == 0) and (orthorder == 0):
         return 1 / (2 * np.power(E, \
@@ -158,7 +157,7 @@ def sampldirderaffgausskernelfromlambda12phi(
                                  / (2 * lambda1 * lambda2)) \
                        * sqrt(lambda1 * lambda2) * pi)
 
-    elif (phiorder == 1) and (orthorder == 0):
+    if (phiorder == 1) and (orthorder == 0):
         return - (lambda2 * (x * cos(phi) + y * sin(phi))) / \
                  (2 * np.power(E, \
                                ((lambda2 * x**2 + lambda1 * y**2) * cos(phi)**2 + \
@@ -166,8 +165,8 @@ def sampldirderaffgausskernelfromlambda12phi(
                                 (lambda1 - lambda2) * x * y *sin(2*phi)) \
                                / (2 * lambda1 * lambda2))  \
                     * pow(lambda1 *lambda2, 1.5) * pi)
-                   
-    elif (phiorder == 0) and (orthorder == 1):
+
+    if (phiorder == 0) and (orthorder == 1):
         return (-2 * lambda1 * y * cos(phi) + 2 * lambda1 * x * sin(phi)) / \
                (4 * np.power(E, \
                             ((lambda2 * x**2 + lambda1 * y**2) * cos(phi)**2 + \
@@ -176,7 +175,7 @@ def sampldirderaffgausskernelfromlambda12phi(
                             / (2 * lambda1 * lambda2)) \
                   * pow(lambda1 * lambda2, 1.5) * pi)
 
-    elif (phiorder == 2) and (orthorder == 0):
+    if (phiorder == 2) and (orthorder == 0):
         return (-2 * lambda1 + x**2 + y**2 + (x**2 - y**2) * cos(2*phi) + \
                  2 * x * y * sin(2*phi)) / \
                (4 * np.power(E, \
@@ -186,7 +185,7 @@ def sampldirderaffgausskernelfromlambda12phi(
                              / (2 * lambda1 * lambda2)) \
                   * pow(lambda1, 2) * sqrt(lambda1 * lambda2) * pi)
 
-    elif (phiorder == 1) and (orthorder == 1):
+    if (phiorder == 1) and (orthorder == 1):
         return (-8 * cos(phi) * sin(phi) *  \
             (-4 * lambda1 * pow(lambda2,2) * cos(phi)^2 + \
              4 * pow(lambda2,2) * x**2 * pow(cos(phi),4) - \
@@ -206,7 +205,8 @@ def sampldirderaffgausskernelfromlambda12phi(
              (pow(lambda1,2) * x**2 + pow(lambda2,2) * x**2 + \
               2 * lambda1 * lambda2 * (-x**2 + y**2)) * pow(sin(2 * phi),2)) - \
             pow(1 + cos(2 * phi) - 2 * sin(phi),2) *  \
-            (2 * pow(lambda1,2) * x * y + 4 * lambda1 * lambda2 * x * y + 2 * pow(lambda2,2) * x * y - \
+            (2 * pow(lambda1,2) * x * y + 4 * lambda1 * lambda2 * x * y \
+                 + 2 * pow(lambda2,2) * x * y - \
              2 * pow(lambda1 - lambda2,2) * x * y * cos(4 * phi) + \
              2 * (lambda1 - lambda2) * (lambda1 * (2 * lambda2 - x**2 - y**2) - \
                                     lambda2 * (x**2 + y**2)) * sin(2 * phi) + \
@@ -218,10 +218,11 @@ def sampldirderaffgausskernelfromlambda12phi(
              pow(lambda2,2) * y**2 * sin(4 * phi)))/ \
            (64 * np.power(E,((lambda2 * x**2 + lambda1 * y**2) * cos(phi)^2 + \
                          (lambda1 * x**2 + lambda2 * y**2) * sin(phi)^2 - \
-                         (lambda1 - lambda2) * x * y * sin(2 * phi))/(2 * lambda1 * lambda2)) *  \
+                         (lambda1 - lambda2) * x * y * sin(2 * phi))/\
+                              (2 * lambda1 * lambda2)) *  \
             pow(lambda1 * lambda2,2.5) * pi)
 
-    elif (phiorder == 0) and (orthorder == 2):
+    if (phiorder == 0) and (orthorder == 2):
         return (-2 * lambda2 + x**2 + y**2 + (-x**2 + y**2)*cos(2*phi) \
                 - 2 * x * y * sin(2*phi)) / \
                 (4 * np.power(E, \
@@ -259,7 +260,7 @@ def sampldirderaffgausskernelfromsigma12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn,
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
 
     with the spatial covariance matrix 
     
@@ -316,7 +317,7 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn,
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
 
     with the spatial covariance matrix 
     
@@ -341,6 +342,8 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     Lindeberg (2021) "Normative theory of visual receptive fields", 
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
+    lambda1 = sigma1**2
+    lambda2 = sigma2**2
     scalenormfactor = sigma1^phiorder * sigma2^orthorder
 
     return scalenormfactor * \
@@ -387,7 +390,7 @@ def samplaffgausskernel(
     ) -> np.ndarray :
     """Computes a sampled affine Gaussian kernel of size N x N defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
 
     with the covariance matrix 
     
@@ -407,11 +410,11 @@ def samplaffgausskernel(
     Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
     of 3-D depth cues from affine distortions of local 2-D structure",
     Image and Vision Computing 15:415-434
-    """   
+    """
     return sampldirderaffgausskernelfromsigma12phi(sigma1, sigma2, phi, 0, 0, N)
 
 
-def scnormdirdermask(
+def scnormaffdirdermask(
     sigma1 : float,
     sigma2 : float,
     phi : float,
@@ -489,7 +492,7 @@ def scnormnumdirdersamplaffgausskernel(
     """
     # ==>> Complement the following code by removal of boundary effects
     affgausskernel = samplaffgausskernel(sigma1, sigma2, phi, N)
-    scnormmask = scnormdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
+    scnormmask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 
     return correlate(affgausskernel, scnormmask)
 
@@ -530,12 +533,12 @@ def L1normnumdirdersamplaffgausskernel(
     """
     # ==>> Complement the following code by removal of boundary effects
     affgausskernel = samplaffgausskernel(sigma1, sigma2, phi, N)
-    scnormmask = L1normdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
+    scnormmask = L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 
     return correlate(affgausskernel, scnormmask)
 
 
-def L1normdirdermask(
+def L1normaffdirdermask(
     sigma1 : float,
     sigma2 : float,
     phi : float,
@@ -575,7 +578,7 @@ def L1normdirdermask(
     Lindeberg (2021) "Normative theory of visual receptive fields", 
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
-    mask = scnormdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
+    mask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 
     return mask / \
            L1norm_scnormdirderaffgausskernel(sigma1, sigma2, phi, phiorder, orthorder)
