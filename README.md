@@ -89,7 +89,7 @@ Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 
 Lindeberg (2015) "Image matching using generalized scale-space
 interest points", Journal of Mathematical Imaging and Vision, 52(1):
-3-36
+3-36.
 ([Open Access](https://dx.doi.org/10.1007/s10851-014-0541-0))
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
