@@ -135,7 +135,7 @@ def make1Dgaussfilter(
         # ==>> adaptation by backprop. That would need a PyTorch interface
         # ==>> for the modified Bessel functions
         return torch.from_numpy(\
-               np.float32(make1Ddiscgaussfilter(sigma, epsilon, D))).type(torch.FloatTensor)
+                (make1Ddiscgaussfilter(sigma, epsilon, D))).type(torch.FloatTensor)
 
     if scspmethod == 'samplgauss':
         return make1Dsamplgaussfilter(sigma, epsilon, D)
@@ -276,27 +276,27 @@ def dxmask():
     """Returns a mask for discrete approximation of the first-order derivative 
     in the x-direction.
     """
-    return torch.from_numpy(np.float32(np.array([[ 0.0, 0.0,  0.0], \
-                                                 [-0.5, 0.0, +0.5], \
-                                                 [ 0.0, 0.0,  0.0]])))
+    return torch.from_numpy(np.array([[ 0.0, 0.0,  0.0], \
+                                      [-0.5, 0.0, +0.5], \
+                                      [ 0.0, 0.0,  0.0]])).type(torch.FloatTensor)
 
 
 def dymask():
     """Returns a mask for discrete approximation of the first-order derivative 
     in the y-direction.
     """
-    return torch.from_numpy(np.float32(np.array([[0.0, +0.5, 0.0], \
-                                                 [0.0,  0.0, 0.0], \
-                                                 [0.0, -0.5, 0.0]])))
+    return torch.from_numpy(np.array([[0.0, +0.5, 0.0], \
+                                      [0.0,  0.0, 0.0], \
+                                      [0.0, -0.5, 0.0]])).type(torch.FloatTensor)
 
 
 def dxxmask():
     """Returns a mask for discrete approximation of the second-order derivative 
     in the x-direction.
     """
-    return torch.from_numpy(np.float32(np.array([[0.0,  0.0, 0.0], \
-                                                 [1.0, -2.0, 1.0], \
-                                                 [0.0,  0.0, 0.0]])))
+    return torch.from_numpy(np.array([[0.0,  0.0, 0.0], \
+                                      [1.0, -2.0, 1.0], \
+                                      [0.0,  0.0, 0.0]])).type(torch.FloatTensor)
 
 
 def dxymask():
@@ -304,18 +304,18 @@ def dxymask():
     derivative in the x- and y-directions.
     """
 
-    return torch.from_numpy(np.float32(np.array([[-0.25, 0.00, +0.25], \
-                                                 [ 0.00, 0.00,  0.00], \
-                                                 [+0.25, 0.00, -0.25]])))
+    return torch.from_numpy(np.array([[-0.25, 0.00, +0.25], \
+                                      [ 0.00, 0.00,  0.00], \
+                                      [+0.25, 0.00, -0.25]])).type(torch.FloatTensor)
 
 
 def dyymask():
     """Returns a mask for discrete approximation of the second-order derivative 
     in the y-direction.
     """
-    return torch.from_numpy(np.float32(np.array([[0.0, +1.0, 0.0], \
-                                                 [0.0, -2.0, 0.0], \
-                                                 [0.0, +1.0, 0.0]])))
+    return torch.from_numpy(np.array([[0.0, +1.0, 0.0], \
+                                      [0.0, -2.0, 0.0], \
+                                      [0.0, +1.0, 0.0]])).type(torch.FloatTensor)
 
 
 def filtersdev(pytorchfilter : torch.tensor) -> float :
@@ -353,7 +353,7 @@ def makesamplaffgausskernel(
     of 3-D depth cues from affine distortions of local 2-D structure",
     Image and Vision Computing 15:415-434
     """
-    return torch.from_numpy(np.float32(samplaffgausskernel(sigma1, sigma2, phi, N)))
+    return torch.from_numpy(samplaffgausskernel(sigma1, sigma2, phi, N)).type(torch.FloatTensor)
 
 
 def makescnormaffdirdermask(
@@ -397,7 +397,7 @@ def makescnormaffdirdermask(
     Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     return torch.from_numpy( \
-        np.float32(scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)))
+            scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)).type(torch.FloatTensor)
 
 
 def makeL1normaffdirdermask(
@@ -442,4 +442,4 @@ def makeL1normaffdirdermask(
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
     return torch.from_numpy( \
-        np.float32(L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)))
+            L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)).type(torch.FloatTensor)

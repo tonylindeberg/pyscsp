@@ -118,7 +118,7 @@ def sampldirderaffgausskernelfromlambda12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn, 
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
@@ -262,7 +262,7 @@ def sampldirderaffgausskernelfromsigma12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn,
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
@@ -314,7 +314,7 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     directions phi and orth, respectively. The Gaussian kernel is, in turn,
     defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
@@ -336,7 +336,7 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     """
     lambda1 = sigma1**2
     lambda2 = sigma2**2
-    scalenormfactor = sigma1^phiorder * sigma2^orthorder
+    scalenormfactor = sigma1**phiorder * sigma2**orthorder
 
     return scalenormfactor * \
            sampldirderaffgausskernelfromsigma12phi(lambda1, lambda2, phi, \
@@ -369,7 +369,7 @@ def numdirdersamplaffgausskernel(
 
     The Gaussian kernel is, in turn, defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
@@ -402,7 +402,7 @@ def samplaffgausskernel(
     ) -> np.ndarray :
     """Computes a sampled affine Gaussian kernel of size N x N defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the covariance matrix 
     
@@ -497,7 +497,7 @@ def scnormnumdirdersamplaffgausskernel(
     derivative operators in the directions phi and orth, respectively, and 
     with the Gaussian kernel is, in turn, defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
@@ -554,7 +554,7 @@ def L1normnumdirdersamplaffgausskernel(
 
     The Gaussian kernel is, in turn, defined as
 
-    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
     with the spatial covariance matrix 
     
