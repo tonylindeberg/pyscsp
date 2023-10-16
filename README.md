@@ -47,6 +47,10 @@ code in affscsp.py.
 -- discrete derivative approximation masks for computing discrete approximations
      of Gaussian derivatives and Gaussian derivative layers in PyTorch.
 
+-- functions for generating affine Gaussian kernels and scale-normalized discrete
+   directional derivative approximation masks, for computing the responses to
+   filter banks of directional derivatives of affine Gaussian kernels in PyTorch.
+
 ## Installation
 
 These modules can be installed using pip.
