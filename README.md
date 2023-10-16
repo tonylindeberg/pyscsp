@@ -20,12 +20,24 @@ For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
 [discscspdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/discscspdemo.ipynb).
 
-
-
 For more technical descriptions about the respective functions, as well
 as explanations of the theoretical properties for different discrete
 approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in discscsp.py.
+
+## affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
+
+This module comprises.
+
+-- functions for computing affine Gaussian kernels and affine Gaussian directional kernels. 
+
+-- functions for a computationally reasonably efficient way to compute 
+filter banks of directional derivative responses over different orders of 
+spatial differentiation.
+
+For more technical descriptions about the respective functions, please
+see the documentation strings for the respective functions in the source
+code in affscsp.py.
 
 ## torchscsp: Subset of functionalities for use in PyTorch:
 
@@ -39,7 +51,8 @@ strings for the respective functions in the source code in discscsp.py.
 
 These modules can be installed using pip.
 
-To install only the discscsp module (without installing the torchscsp module which requires a larger
+To install only the discscsp and affscsp modules
+(without installing the torchscsp module which requires a larger
 installation of PyTorch) do:
 ```bash
 pip install pyscsp

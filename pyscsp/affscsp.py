@@ -1,9 +1,9 @@
-""" affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
+"""affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
 
 For computing affine Gaussian kernels and affine Gaussian directional kernels, 
 as well as providing a computationally reasonably efficient way to compute 
-filter banks of directional derivative responses over multiple image directions
-as well as orders of spatial differentiation.
+filter banks of directional derivative responses over different orders of 
+spatial differentiation.
 
 References:
 
@@ -88,9 +88,7 @@ def CxxCxyCyyfromsigma12phi(
     lambda1 = sigma1**2
     lambda2 = sigma2**2
 
-    Cxx, Cxy, Cyy = CxxCxyCyyfromlambda12phi(lambda1, lambda2, phi)
-
-    return Cxx, Cxy, Cyy
+    return CxxCxyCyyfromlambda12phi(lambda1, lambda2, phi)
 
 
 def sampldirderaffgausskernelfromlambda12phi(
@@ -253,7 +251,7 @@ def sampldirderaffgausskernelfromsigma12phi(
 
     D_phi^phiorder D_orth^orthorder g(x; Sigma)
 
-    for
+    for .
 
     D_phi  =  cos phi D_x + sin phi D_y
     D_orth = -sin phi D_x + cos phi D_y
@@ -574,6 +572,7 @@ def L1normnumdirdersamplaffgausskernel(
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
+    Heliyon 7(1): e05897: 1-20.
     """
     # ==>> Complement the following code by removal of boundary effects
     affgausskernel = samplaffgausskernel(sigma1, sigma2, phi, N)
