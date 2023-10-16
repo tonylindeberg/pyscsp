@@ -1,4 +1,4 @@
-""" Affine Scale-Space Toolbox for Python
+""" affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
 
 For computing affine Gaussian kernels and affine Gaussian directional kernels, 
 as well as providing a computationally reasonably efficient way to compute 
@@ -76,8 +76,9 @@ def CxxCxyCyyfromsigma12phi(
     Sigma = [[Cxx, Cxy],
              [Cxy, Cyy]]
 
-    given a specification of the eigenvalues lambda1 and lambda2 of the
-    covariance matrix as well as its orientation.
+    given a specification of the eigenvalues scale parameter sigma1
+    and sigma2 (the square roots of the eigenvalues) of the covariance 
+    matrix as well as its orientation.
 
     Reference:
 
@@ -124,7 +125,7 @@ def sampldirderaffgausskernelfromlambda12phi(
     Sigma = [[Cxx, Cxy],
              [Cxy, Cyy]]
 
-    in the code below represented by the parameterization
+    represented by the parameterization
 
     Cxx = lambda1 * cos(phi)**2 + lambda2 * sin(phi)**2
     Cxy = (lambda1 - lambda2) * cos(phi) * sin(phi)
@@ -186,20 +187,21 @@ def sampldirderaffgausskernelfromlambda12phi(
                   * pow(lambda1, 2) * sqrt(lambda1 * lambda2) * pi)
 
     if (phiorder == 1) and (orthorder == 1):
+        # ==>> The following code does not give the right result and needs to be replaced
         return (-8 * cos(phi) * sin(phi) *  \
-            (-4 * lambda1 * pow(lambda2,2) * cos(phi)^2 + \
+            (-4 * lambda1 * pow(lambda2,2) * cos(phi)**2 + \
              4 * pow(lambda2,2) * x**2 * pow(cos(phi),4) - \
              8 * (lambda1 - lambda2) * lambda2 * x * y * pow(cos(phi),3) * sin(phi) - \
-             4 * pow(lambda1,2) * lambda2 * sin(phi)^2 - \
+             4 * pow(lambda1,2) * lambda2 * sin(phi)**2 - \
              8 * lambda1 * (lambda1 - lambda2) * x * y * cos(phi) * pow(sin(phi),3) + \
              4 * pow(lambda1,2) * x**2 * pow(sin(phi),4) + \
              (pow(lambda1,2) * y**2 + pow(lambda2,2) * y**2 + \
               2 * lambda1 * lambda2 * (x**2 - y**2)) * pow(sin(2 * phi),2)) + \
             16 * cos(phi) * sin(phi) *  \
-            (-4 * pow(lambda1,2) * lambda2 * cos(phi)^2 + \
+            (-4 * pow(lambda1,2) * lambda2 * cos(phi)**2 + \
              4 * pow(lambda1,2) * y**2 * pow(cos(phi),4) - \
              8 * lambda1 * (lambda1 - lambda2) * x * y * pow(cos(phi),3) * sin(phi) - \
-             4 * lambda1 * pow(lambda2,2) * sin(phi)^2 - \
+             4 * lambda1 * pow(lambda2,2) * sin(phi)**2 - \
              8 * (lambda1 - lambda2) * lambda2 * x * y * cos(phi) * pow(sin(phi),3) + \
              4 * pow(lambda2,2) * y**2 * pow(sin(phi),4) + \
              (pow(lambda1,2) * x**2 + pow(lambda2,2) * x**2 + \
@@ -216,8 +218,8 @@ def sampldirderaffgausskernelfromlambda12phi(
              pow(lambda1,2) * y**2 * sin(4 * phi) + \
              2 * lambda1 * lambda2 * y**2 * sin(4 * phi) - \
              pow(lambda2,2) * y**2 * sin(4 * phi)))/ \
-           (64 * np.power(E,((lambda2 * x**2 + lambda1 * y**2) * cos(phi)^2 + \
-                         (lambda1 * x**2 + lambda2 * y**2) * sin(phi)^2 - \
+           (64 * np.power(E,((lambda2 * x**2 + lambda1 * y**2) * cos(phi)**2 + \
+                         (lambda1 * x**2 + lambda2 * y**2) * sin(phi)**2 - \
                          (lambda1 - lambda2) * x * y * sin(2 * phi))/\
                               (2 * lambda1 * lambda2)) *  \
             pow(lambda1 * lambda2,2.5) * pi)
@@ -267,16 +269,11 @@ def sampldirderaffgausskernelfromsigma12phi(
     Sigma = [[Cxx, Cxy],
              [Cxy, Cyy]]
 
-    in the code below represented by the parameterization
+    represented by the parameterization
 
-    Cxx = lambda1 * cos(phi)**2 + lambda2 * sin(phi)**2
-    Cxy = (lambda1 - lambda2) * cos(phi) * sin(phi)
-    Cyy = lambda1 * sin(phi)**2 + lambda2 * cos(phi)**2
-
-    for
-
-    lambda1 = sigma1^2
-    lambda2 = sigma2^2   
+    Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)**2 + sigma2^2 * cos(phi)**2
 
     Note: You have to determine an appropriate choice of N in a complementary way.
 
@@ -324,23 +321,18 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     Sigma = [[Cxx, Cxy],
              [Cxy, Cyy]]
 
-    in the code below represented by the parameterization
+    in represented by the parameterization
 
-    Cxx = lambda1 * cos(phi)**2 + lambda2 * sin(phi)**2
-    Cxy = (lambda1 - lambda2) * cos(phi) * sin(phi)
-    Cyy = lambda1 * sin(phi)**2 + lambda2 * cos(phi)**2
-
-    for
-
-    lambda1 = sigma1^2
-    lambda2 = sigma2^2   
+    Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)**2 + sigma2^2 * cos(phi)**2
 
     Note: You have to determine an appropriate choice of N in a complementary way.
 
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     lambda1 = sigma1**2
     lambda2 = sigma2**2
@@ -359,9 +351,9 @@ def numdirdersamplaffgausskernel(
     orthorder : int,
     N : int
     ) -> np.ndarray :
-    """Computes a kernel of size N x N representing the sampled directional
-    derivative of order phiorder in the direction phi and of order orthorder
-    in a direction orthogonal to phi.
+    """Computes a kernel of size N x N representing a numerical approximation
+    of the directional derivative of order phiorder in the direction phi and 
+    of order orthorder in a direction orthogonal to phi.
 
     The kernel is defined as
 
@@ -374,6 +366,26 @@ def numdirdersamplaffgausskernel(
 
     where D_phi and D_orth represent (discrete approximations of) the partial 
     derivative operators in the directions phi and orth, respectively. 
+
+    The Gaussian kernel is, in turn, defined as
+
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+
+    with the spatial covariance matrix 
+    
+    Sigma = [[Cxx, Cxy],
+             [Cxy, Cyy]]
+
+    represented by the parameterization
+
+    Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)**2 + sigma2^2 * cos(phi)**2
+
+    Reference:
+
+    Lindeberg (2021) "Normative theory of visual receptive fields", 
+    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
     # ==>> Complement the following code by removal of boundary effects
     affgausskernel = samplaffgausskernel(sigma1, sigma2, phi, N)
@@ -422,8 +434,10 @@ def scnormaffdirdermask(
     orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
-    application of this mask to a zero-order affine Gaussian kernel gives an
-    approximation of the scale-normalized directional derivative according to
+    application of this mask to an image smoothed by a zero-order affine Gaussian 
+    kernel (assumed to have been determined using the same values of sigma1,
+    sigma2 and phi) gives an approximation of the scale-normalized directional 
+    derivative according to
 
     sigma1^phiorder sigma2^orthorder D_phi^phiorder D_orth^orthorder g(x; Sigma)
 
@@ -439,18 +453,18 @@ def scnormaffdirdermask(
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
     method that makes use of a filter bank of directional derivatives of 
-    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian kernels, the intention is that the computationally heavy
     affine Gaussian smoothing operation should be performed only once, and
     that different directional derivative approximation masks should then
     be applied to the same affine Gaussian smoothed image, thus saving
     a substantial amount of work, compared to applying full size affine
-    Gaussian directional derivative masks for choice of order for the
-    directional derivatives.
+    Gaussian directional derivative masks for different choices of orders
+    of the directional derivatives.
 
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     scalenormfactor = sigma1**phiorder * sigma2**orthorder
     rawmask = dirdermask(phi, phiorder, orthorder)
@@ -480,7 +494,21 @@ def scnormnumdirdersamplaffgausskernel(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent (discrete approximations of) the partial 
-    derivative operators in the directions phi and orth, respectively.
+    derivative operators in the directions phi and orth, respectively, and 
+    with the Gaussian kernel is, in turn, defined as
+
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+
+    with the spatial covariance matrix 
+    
+    Sigma = [[Cxx, Cxy],
+             [Cxy, Cyy]]
+
+    represented by the parameterization
+
+    Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)**2 + sigma2^2 * cos(phi)**2
 
     Note: The intention is not that this function should be used for computing
     output from receptive field responses. It is mererly intended for purposes
@@ -489,6 +517,7 @@ def scnormnumdirdersamplaffgausskernel(
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     # ==>> Complement the following code by removal of boundary effects
     affgausskernel = samplaffgausskernel(sigma1, sigma2, phi, N)
@@ -522,6 +551,21 @@ def L1normnumdirdersamplaffgausskernel(
     derivative operators in the directions phi and orth, respectively, and the 
     constant C is determined such that the corresponding continuous kernel 
     would have unit L1-norm.
+
+    The Gaussian kernel is, in turn, defined as
+
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^{-1} x/2)
+
+    with the spatial covariance matrix 
+    
+    Sigma = [[Cxx, Cxy],
+             [Cxy, Cyy]]
+
+    represented by the parameterization
+
+    Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)**2 + sigma2^2 * cos(phi)**2
 
     Note: The intention is not that this function should be used for computing
     output from receptive field responses. It is mererly intended for purposes
@@ -558,25 +602,26 @@ def L1normaffdirdermask(
 
     where D_phi and D_orth represent the partial derivative operators in the 
     directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma) is computed outside of this function), and the constant
-    C is determined such that the corresponding continuous kernel would have
-    unit L1-norm.
+    with g(x; Sigma) with its covariance matrix, specified using the same
+    values of sigma1, sigma2 and phi, is computed outside of this function), 
+    and with the constant C is determined such that the corresponding 
+    continuous kernel would have unit L1-norm.
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
     method that makes use of a filter bank of directional derivatives of 
-    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian kernels, the intention is that the computationally heavy
     affine Gaussian smoothing operation should be performed only once, and
     that different directional derivative approximation masks should then
     be applied to the same affine Gaussian smoothed image, thus saving
     a substantial amount of work, compared to applying full size affine
-    Gaussian directional derivative masks for choice of order for the
-    directional derivatives.
+    Gaussian directional derivative masks for different choices of orders
+    of the directional derivatives.
 
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     mask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 

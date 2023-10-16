@@ -1,6 +1,6 @@
-"""Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch
+"""*** Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch ***
 
-Extends parts of the discscsp package to PyTorch networks.
+Extend parts of the discscsp package to PyTorch networks.
 
 For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
@@ -26,6 +26,29 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
+
+
+*** Affine Scale-Space and Scale-Space Derivative Toolbox for Python ***
+
+Functions for performing the equivalent effect of convolving an image with
+a discrete approximations of directional derivatives of affine Gaussian
+kernel, including mechanisms for scale normalization as well as a mechanism
+for normalizing receptive field responses of different orders of spatial
+diffentiation.
+
+References:
+
+Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+
+Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
+of 3-D depth cues from affine distortions of local 2-D structure",
+Image and Vision Computing 15: 415-434
+
+Lindeberg (2013) "A computational theory of visual receptive fields", 
+Biological Cybernetics, 107(6): 589-635. (See Equation (69).)
+
+Lindeberg (2021) "Normative theory of visual receptive fields", 
+Heliyon 7(1): e05897: 1-20.
 """
 
 import math
@@ -112,7 +135,7 @@ def make1Dgaussfilter(
         # ==>> adaptation by backprop. That would need a PyTorch interface
         # ==>> for the modified Bessel functions
         return torch.from_numpy(\
-               make1Ddiscgaussfilter(sigma, epsilon, D)).type(torch.FloatTensor)
+               np.float32(make1Ddiscgaussfilter(sigma, epsilon, D))).type(torch.FloatTensor)
 
     if scspmethod == 'samplgauss':
         return make1Dsamplgaussfilter(sigma, epsilon, D)
@@ -253,27 +276,27 @@ def dxmask():
     """Returns a mask for discrete approximation of the first-order derivative 
     in the x-direction.
     """
-    return torch.from_numpy(np.array([[ 0.0, 0.0,  0.0], \
-                                      [-0.5, 0.0, +0.5], \
-                                      [ 0.0, 0.0,  0.0]]))
+    return torch.from_numpy(np.float32(np.array([[ 0.0, 0.0,  0.0], \
+                                                 [-0.5, 0.0, +0.5], \
+                                                 [ 0.0, 0.0,  0.0]])))
 
 
 def dymask():
     """Returns a mask for discrete approximation of the first-order derivative 
     in the y-direction.
     """
-    return torch.from_numpy(np.array([[0.0, +0.5, 0.0], \
-                                      [0.0,  0.0, 0.0], \
-                                      [0.0, -0.5, 0.0]]))
+    return torch.from_numpy(np.float32(np.array([[0.0, +0.5, 0.0], \
+                                                 [0.0,  0.0, 0.0], \
+                                                 [0.0, -0.5, 0.0]])))
 
 
 def dxxmask():
     """Returns a mask for discrete approximation of the second-order derivative 
     in the x-direction.
     """
-    return torch.from_numpy(np.array([[0.0,  0.0, 0.0], \
-                                      [1.0, -2.0, 1.0], \
-                                      [0.0,  0.0, 0.0]]))
+    return torch.from_numpy(np.float32(np.array([[0.0,  0.0, 0.0], \
+                                                 [1.0, -2.0, 1.0], \
+                                                 [0.0,  0.0, 0.0]])))
 
 
 def dxymask():
@@ -281,18 +304,18 @@ def dxymask():
     derivative in the x- and y-directions.
     """
 
-    return torch.from_numpy(np.array([[-0.25, 0.00, +0.25], \
-                                      [ 0.00, 0.00,  0.00], \
-                                      [+0.25, 0.00, -0.25]]))
+    return torch.from_numpy(np.float32(np.array([[-0.25, 0.00, +0.25], \
+                                                 [ 0.00, 0.00,  0.00], \
+                                                 [+0.25, 0.00, -0.25]])))
 
 
 def dyymask():
     """Returns a mask for discrete approximation of the second-order derivative 
     in the y-direction.
     """
-    return torch.from_numpy(np.array([[0.0, +1.0, 0.0], \
-                                      [0.0, -2.0, 0.0], \
-                                      [0.0, +1.0, 0.0]]))
+    return torch.from_numpy(np.float32(np.array([[0.0, +1.0, 0.0], \
+                                                 [0.0, -2.0, 0.0], \
+                                                 [0.0, +1.0, 0.0]])))
 
 
 def filtersdev(pytorchfilter : torch.tensor) -> float :
@@ -330,7 +353,7 @@ def makesamplaffgausskernel(
     of 3-D depth cues from affine distortions of local 2-D structure",
     Image and Vision Computing 15:415-434
     """
-    return torch.from_numpy(samplaffgausskernel(sigma1, sigma2, phi, N))
+    return torch.from_numpy(np.float32(samplaffgausskernel(sigma1, sigma2, phi, N)))
 
 
 def makescnormaffdirdermask(
@@ -341,8 +364,9 @@ def makescnormaffdirdermask(
     orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
-    application of this mask to a zero-order affine Gaussian kernel gives an
-    approximation of the scale-normalized directional derivative according to
+    application of this mask to an image that has been smoothed with a zero-order 
+    affine Gaussian kernel gives an approximation of the scale-normalized 
+    directional derivative response to the receptive field
 
     sigma1^phiorder sigma2^orthorder D_phi^phiorder D_orth^orthorder g(x; Sigma)
 
@@ -353,26 +377,27 @@ def makescnormaffdirdermask(
 
     where D_phi and D_orth represent the partial derivative operators in the 
     directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma) is computed outside of this function).
+    with g(x; Sigma), with the covariance matrix Sigma specified using the same
+    values of sigma1, sigma2 and phi, is computed outside of this function).
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
     method that makes use of a filter bank of directional derivatives of 
-    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian kernels, the intention is that the computationally heavy
     affine Gaussian smoothing operation should be performed only once, and
     that different directional derivative approximation masks should then
     be applied to the same affine Gaussian smoothed image, thus saving
     a substantial amount of work, compared to applying full size affine
-    Gaussian directional derivative masks for choice of order for the
-    directional derivatives.
+    Gaussian directional derivative masks for different choices of orders
+    for the directional derivatives.
 
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     return torch.from_numpy( \
-        scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
+        np.float32(scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)))
 
 
 def makeL1normaffdirdermask(
@@ -395,20 +420,21 @@ def makeL1normaffdirdermask(
 
     where D_phi and D_orth represent the partial derivative operators in the 
     directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma) is computed outside of this function), and the constant
-    C is determined such that the corresponding continuous kernel would have
-    unit L1-norm.
+    with g(x; Sigma), with the covariance matrix Sigma specified using the
+    same values of sigma1, sigma2 and phi, is computed outside of this function), 
+    and with the constant C determined such that the corresponding continuous 
+    kernel would have unit L1-norm.
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
     method that makes use of a filter bank of directional derivatives of 
-    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian kernels, the intention is that the computationally heavy
     affine Gaussian smoothing operation should be performed only once, and
     that different directional derivative approximation masks should then
     be applied to the same affine Gaussian smoothed image, thus saving
     a substantial amount of work, compared to applying full size affine
-    Gaussian directional derivative masks for choice of order for the
-    directional derivatives.
+    Gaussian directional derivative masks for different choices of the orders
+    for the directional derivatives.
 
     Reference:
 
@@ -416,4 +442,4 @@ def makeL1normaffdirdermask(
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
     return torch.from_numpy( \
-        L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
+        np.float32(L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)))
