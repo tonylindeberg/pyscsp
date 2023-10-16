@@ -41,6 +41,8 @@ from pyscsp.discscsp import gaussfiltsize, variance1D
 # ==>> for the discrete analogue of the Gaussian kernel
 from pyscsp.discscsp import make1Ddiscgaussfilter
 
+from pyscsp.affscsp import samplaffgausskernel, scnormdirdermask, L1normdirdermask
+
 
 def make1Dgaussfilter(
         # sigma should be a 0-D PyTorch tensor if sigma is to be learned
@@ -64,8 +66,8 @@ def make1Dgaussfilter(
     any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
     are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
     for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
-    kernel is also equal to the sigma value. The current implementation of the this filter 
-    in terms of modified Bessel functions of integer order is, however, not 
+    kernel is also equal to the sigma value. The current implementation of the this 
+    filter in terms of modified Bessel functions of integer order is, however, not 
     supported in terms of existing PyTorch functions, implying that the choice 
     of this method will not allow for scale adaptation by backprop.
 
@@ -297,3 +299,122 @@ def filtersdev(pytorchfilter : torch.tensor) -> float :
     """Returns the actual spatial standard deviation of a 1-D PyTorch filter
     """
     return math.sqrt(variance1D(pytorchfilter.numpy()))
+
+
+def makesamplaffgausskernel(
+    sigma1 : float,
+    sigma2 : float,
+    phi : float,
+    N : int
+    ) -> np.ndarray :
+    """Computes a sampled affine Gaussian kernel of size N x N defined as
+
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T \Sigma^{-1} x/2)
+
+    with the covariance matrix 
+    
+    Sigma = [[Cxx, Cxy],
+             [Cxy, Cyy]]
+
+    parameterized as
+
+    Cxx = sigma1^2 * cos(phi)^2 + sigma2^2 * sin(phi)^2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)^2 + sigma2^2 * cos(phi)^2
+
+    References:
+
+    Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+
+    Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
+    of 3-D depth cues from affine distortions of local 2-D structure",
+    Image and Vision Computing 15:415-434
+    """   
+    return torch.from_numpy(samplaffgausskernel(sigma1, sigma2, phi, N))
+
+
+def makescnormdirdermask(
+    sigma1 : float,
+    sigma2 : float,
+    phi : float,
+    phiorder : int,
+    orthorder : int
+    ) -> np.ndarray :
+    """Returns a discrete directional derivative approximation mask, such that
+    application of this mask to a zero-order affine Gaussian kernel gives an
+    approximation of the scale-normalized directional derivative according to
+
+    sigma1^phiorder sigma2^orthorder D_phi^phiorder D_orth^orthorder g(x; Sigma)
+
+    for
+
+    D_phi  =  cos phi D_x + sin phi D_y
+    D_orth = -sin phi D_x + cos phi D_y
+
+    where D_phi and D_orth represent the partial derivative operators in the 
+    directions phi and orth, respectively (and it is assumed that convolution
+    with g(x; Sigma) is computed outside of this function).
+
+    The intention is that the mask returned by this function should be applied
+    to affine Gaussian smoothed images. Specifically, for an image processing
+    method that makes use of a filter bank of directional derivatives of 
+    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian smoothing operation should be performed only once, and
+    that different directional derivative approximation masks should then
+    be applied to the same affine Gaussian smoothed image, thus saving
+    a substantial amount of work, compared to applying full size affine
+    Gaussian directional derivative masks for choice of order for the
+    directional derivatives.
+
+    Reference:
+
+    Lindeberg (2021) "Normative theory of visual receptive fields", 
+    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    """
+    return torch.from_numpy( \
+        scnormdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
+
+
+def makeL1normdirdermask(
+    sigma1 : float,
+    sigma2 : float,
+    phi : float,
+    phiorder : int,
+    orthorder : int
+    ) -> np.ndarray :
+    """Returns a discrete directional derivative approximation mask, such that
+    application of this mask to a zero-order affine Gaussian kernel gives an
+    approximation of the scale-normalized directional derivative according to
+
+    C sigma1^phiorder sigma2^orthorder D_phi^phiorder D_orth^orthorder g(x; Sigma)
+
+    for
+
+    D_phi  =  cos phi D_x + sin phi D_y
+    D_orth = -sin phi D_x + cos phi D_y
+
+    where D_phi and D_orth represent the partial derivative operators in the 
+    directions phi and orth, respectively (and it is assumed that convolution
+    with g(x; Sigma) is computed outside of this function), and the constant
+    C is determined such that the corresponding continuous kernel would have
+    unit L1-norm.
+
+    The intention is that the mask returned by this function should be applied
+    to affine Gaussian smoothed images. Specifically, for an image processing
+    method that makes use of a filter bank of directional derivatives of 
+    affine Gaussian kernel, the intention is that the computationally heavy
+    affine Gaussian smoothing operation should be performed only once, and
+    that different directional derivative approximation masks should then
+    be applied to the same affine Gaussian smoothed image, thus saving
+    a substantial amount of work, compared to applying full size affine
+    Gaussian directional derivative masks for choice of order for the
+    directional derivatives.
+
+    Reference:
+
+    Lindeberg (2021) "Normative theory of visual receptive fields", 
+    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    """
+    return torch.from_numpy( \
+        L1normdirdermask(sigma1, sigma2, phi, phiorder, orthorder))
+

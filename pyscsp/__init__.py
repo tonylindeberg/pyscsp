@@ -1,6 +1,7 @@
 """Package imports"""
 import warnings
 from .discscsp import *
+from .affscsp import *
 try:
     import torch
     from .torchscsp import *
