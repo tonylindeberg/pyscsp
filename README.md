@@ -92,6 +92,11 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 ([Online edition](http://dx.doi.org/10.1007/978-1-4757-6465-9))
 
+Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
+of 3-D depth cues from affine distortions of local 2-D structure",
+Image and Vision Computing 15: 415-434
+([preprint](http://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A472972&dswid=2395))
+
 Lindeberg (1998a) "Feature detection with automatic scale selection", 
 International Journal of Computer Vision, vol 30(2): 77-116.
 ([preprint](http://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-40224))
@@ -104,10 +109,18 @@ Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 ([preprint](https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409))
 
+Lindeberg (2013) "A computational theory of visual receptive fields", 
+Biological Cybernetics, 107(6): 589-635.
+([Open Access](https://doi.org/10.1007/s00422-013-0569-z))
+
 Lindeberg (2015) "Image matching using generalized scale-space
 interest points", Journal of Mathematical Imaging and Vision, 52(1):
 3-36.
 ([Open Access](https://dx.doi.org/10.1007/s10851-014-0541-0))
+
+Lindeberg (2021) "Normative theory of visual receptive fields", 
+Heliyon 7(1): e05897: 1-20.
+([Open Access](https://doi.org/10.1016/j.heliyon.2021.e05897))
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
@@ -140,6 +153,11 @@ kernel. This treatment also describes theoretical properties of the
 sampled Gaussian kernel, the integrated Gaussian kernel and the
 linearily integrated Gaussian kernel.
 
+Chapter 14 in the book (Lindeberg 1993) and the paper
+(Lindeberg and Garding 1997) describe the notion of affine Gaussian
+scale space, with its closedness property under affine image
+transformations, referred to as affine covariance or affine equivariance.
+
 The paper (Lindeberg 1998a) describes the blob detector based on the
 spatial extrema of the Laplacian operator (N-jet function 'Laplace'), the
 interest point detector based on spatial extrema of the determinant of
@@ -168,6 +186,14 @@ good first introduction to this area, including demonstrations of how
 different types of differential invariants in scale-space (in this
 code referred to as N-jet functions) can be used for basic purposes of
 detecting image features in image data.
+
+The papers (Lindeberg 2013) and (Lindeberg 2021) demonstrate how
+the spatial component of the receptive fields of simple cells in
+the primary visual cortex can be well modelled by directional
+derivatives of affine Gaussian kernels. In the code below, we
+provide functions for generating such kernels corresponding to
+directional derivatives of affine Gaussian kernels and for computing
+the effect of convolving images with such kernels.
 
 The paper (Lindeberg 2015) gives a more modern treatment of some of
 the concepts described in (Lindeberg 1998a), regarding the use of
