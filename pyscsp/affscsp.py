@@ -116,8 +116,9 @@ def sampldirderaffgausskernelfromlambda12phi(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively. The Gaussian kernel is, in turn, 
-    defined as
+    directions phi and its orthogonal direction orth, respectively. 
+
+    The Gaussian kernel is, in turn, defined as
 
     g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
@@ -232,8 +233,9 @@ def sampldirderaffgausskernelfromsigma12phi(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively. The Gaussian kernel is, in turn,
-    defined as
+    directions phi and and its orthogonal direction orth, respectively. 
+
+    The Gaussian kernel is, in turn, defined as
 
     g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
@@ -284,8 +286,9 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively. The Gaussian kernel is, in turn,
-    defined as
+    directions phi and and its orthogonal direction orth, respectively. 
+
+    The Gaussian kernel is, in turn, defined as
 
     g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
@@ -338,7 +341,8 @@ def numdirdersamplaffgausskernel(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent (discrete approximations of) the partial 
-    derivative operators in the directions phi and orth, respectively. 
+    derivative operators in the directions phi and its orthogonal direction
+    orth, respectively. 
 
     The Gaussian kernel is, in turn, defined as
 
@@ -420,8 +424,9 @@ def scnormaffdirdermask(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma) is computed outside of this function).
+    directions phi and its orthogonal direction orth, respectively, where it
+    is assumed that convolution with g(x; Sigma) is computed outside of this 
+    function, and using the same values of sigma1, sigma2 and phi.
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
@@ -467,8 +472,8 @@ def scnormnumdirdersamplaffgausskernel(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent (discrete approximations of) the partial 
-    derivative operators in the directions phi and orth, respectively, and 
-    with the Gaussian kernel is, in turn, defined as
+    derivative operators in the directions phi and its orthogonal direction orth, 
+    respectively, and with the Gaussian kernel is, in turn, defined as
 
     g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
 
@@ -521,9 +526,9 @@ def L1normnumdirdersamplaffgausskernel(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent (discrete approximations of) the partial 
-    derivative operators in the directions phi and orth, respectively, and the 
-    constant C is determined such that the corresponding continuous kernel 
-    would have unit L1-norm.
+    derivative operators in the directions phi and its orthogonal direction
+    orth, respectively, and the constant C is determined such that the 
+    corresponding continuous kernel would have unit L1-norm.
 
     The Gaussian kernel is, in turn, defined as
 
@@ -575,11 +580,11 @@ def L1normaffdirdermask(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma) with its covariance matrix, specified using the same
-    values of sigma1, sigma2 and phi, is computed outside of this function), 
-    and with the constant C is determined such that the corresponding 
-    continuous kernel would have unit L1-norm.
+    directions phi and its orthogonal direction orth, respectively, (where it
+    is assumed that convolution with g(x; Sigma), with its covariance matrix
+    specified using the same values of sigma1, sigma2 and phi, is computed 
+    outside of this function), and with the constant C is determined such 
+    that the corresponding continuous kernel would have unit L1-norm.
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing

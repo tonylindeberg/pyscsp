@@ -1,8 +1,8 @@
-"""*** Scale Space Toolbox for PyTorch ***
+"""Scale Space Toolbox for PyTorch
 
 Extend subsets of the discscsp and affscsp modules to PyTorch:
 
-(discscp): For computing discrete scale-space smoothing by convolution with the discrete
+(discscp) For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
 by applying central difference operators to the smoothed data. 
 
@@ -114,7 +114,7 @@ def make1Dgaussfilter(
     Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
     Pattern Analysis and Machine Intelligence, 12(3): 234--254.
 
-    Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+    Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
     """
     if scspmethod == 'discgauss':
         # ==>> Note! Here sigma is not PyTorch variable to allow for scale
@@ -362,9 +362,10 @@ def makescnormaffdirdermask(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma), with the covariance matrix Sigma specified using the same
-    values of sigma1, sigma2 and phi, is computed outside of this function).
+    directions phi and its orthogonal direction orth, respectively, where it
+    is assumed that convolution with g(x; Sigma), (with the covariance matrix 
+    Sigma specified using the same values of sigma1, sigma2 and phi), is 
+    computed outside of this function).
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
@@ -405,11 +406,11 @@ def makeL1normaffdirdermask(
     D_orth = -sin phi D_x + cos phi D_y
 
     where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and orth, respectively (and it is assumed that convolution
-    with g(x; Sigma), with the covariance matrix Sigma specified using the
-    same values of sigma1, sigma2 and phi, is computed outside of this function), 
-    and with the constant C determined such that the corresponding continuous 
-    kernel would have unit L1-norm.
+    directions phi and it orthogonal direction orth, respectively, where it
+    is assumed that convolution with g(x; Sigma), (with the covariance matrix 
+    Sigma, as specified using the same values of sigma1, sigma2 and phi), 
+    is computed outside of this function, and with the constant C determined 
+    such that the corresponding continuous kernel would have unit L1-norm.
 
     The intention is that the mask returned by this function should be applied
     to affine Gaussian smoothed images. Specifically, for an image processing
@@ -425,7 +426,7 @@ def makeL1normaffdirdermask(
     Reference:
 
     Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (23)).
+    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
     """
     return torch.from_numpy( \
             L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)).type(torch.FloatTensor)

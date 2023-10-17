@@ -56,7 +56,7 @@ from scipy.special import ive, erf, erfcinv
 class ScSpMethod(NamedTuple):
     """Object for storing the parameters of a scale-space discretization method, 
     which can be of either of the types  'discgauss', 'samplgauss', 'normsamplgauss', 
-    'intgauss' or 'linintgauss
+    'intgauss' or 'linintgauss'
     """
     methodname: str
     epsilon: float
