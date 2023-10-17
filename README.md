@@ -26,7 +26,7 @@ approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in 
 [discscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/discscsp.py).
 
-## affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
+## affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This module comprises:
 
