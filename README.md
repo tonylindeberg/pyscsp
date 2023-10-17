@@ -23,33 +23,42 @@ features, please see the enclosed Jupyter notebook
 For more technical descriptions about the respective functions, as well
 as explanations of the theoretical properties for different discrete
 approximations of the Gaussian kernel, please see the documentation
-strings for the respective functions in the source code in discscsp.py.
+strings for the respective functions in the source code in 
+[discscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/discscsp.py).
 
 ## affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
 
-This module comprises.
+This module comprises:
 
--- functions for computing affine Gaussian kernels and affine Gaussian directional kernels. 
-
--- functions for a computationally reasonably efficient way to compute 
-filter banks of directional derivative responses over different orders of 
+-- functions for computing affine Gaussian kernels and affine Gaussian
+directional derivative approximation masks, which can be used for compute 
+the responses of filter banks of directional derivative responses over different orders of 
 spatial differentiation.
 
 For more technical descriptions about the respective functions, please
 see the documentation strings for the respective functions in the source
-code in affscsp.py.
+code in 
+[affscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/affscsp.py).
 
 ## torchscsp: Subset of functionalities for use in PyTorch:
 
+This module comprises:
+
 -- functions for generating 1-D discrete approximations of the Gaussian kernel
-     for spatial smoothing with separable filtering in PyTorch.
+     for spatial smoothing with separable filtering in PyTorch,
 	 
 -- discrete derivative approximation masks for computing discrete approximations
-     of Gaussian derivatives and Gaussian derivative layers in PyTorch.
+     of Gaussian derivatives and Gaussian derivative layers in
+     PyTorch, and
 
 -- functions for generating affine Gaussian kernels and scale-normalized discrete
    directional derivative approximation masks, which can be used for computing the responses to
    filter banks of directional derivatives of affine Gaussian kernels in PyTorch.
+
+For more technical descriptions about the respective functions, please
+see the documentation strings for the respective functions in the source
+code in 
+[torchscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/torchscsp.py).
 
 ## Installation
 
@@ -68,7 +77,7 @@ following command:
 pip install 'pyscsp[torch]'
 ```
 Note, however, that you must then have PyTorch already installed to use
-this option. Otherwise, the installation command will generate an
+this option. Otherwise, the installation command may generate an
 error message.
 
 These modules can also be downloaded directly from GitHub:
