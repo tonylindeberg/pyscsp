@@ -1,20 +1,23 @@
-"""affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python
+"""Affine Scale-Space and Scale-Space Derivative Toolbox for Python
 
-For computing affine Gaussian kernels and affine Gaussian directional kernels, 
-as well as providing a computationally reasonably efficient way to compute 
-filter banks of directional derivative responses over different orders of 
-spatial differentiation.
+For computing affine Gaussian kernels and affine Gaussian directional 
+derivative kernels,  as well as providing a computationally reasonably 
+efficient way to compute filter banks of directional derivative responses 
+over different orders of spatial differentiation, by defining directional
+derivative approximation masks of small spatial support, which are to
+be applied to image data that has been already smoothed by regular 
+affine Gaussian kernels.
 
 References:
 
-Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
 
 Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
 of 3-D depth cues from affine distortions of local 2-D structure",
 Image and Vision Computing 15: 415-434
 
 Lindeberg (2013) "A computational theory of visual receptive fields", 
-Biological Cybernetics, 107(6): 589-635. (See Equation (69).)
+Biological Cybernetics, 107(6): 589-635.
 
 Lindeberg (2021) "Normative theory of visual receptive fields", 
 Heliyon 7(1): e05897: 1-20.
@@ -30,7 +33,7 @@ The articles (Lindeberg 2013) and (Lindeberg 2021) demonstrate how
 the spatial component of the receptive fields of simple cells in
 the primary visual cortex can be well modelled by directional
 derivatives of affine Gaussian kernels. In the code below, we
-provide functions for generating such kernels corresponding to
+provide functions for generating such kernels, corresponding to
 directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
 """
@@ -185,42 +188,14 @@ def sampldirderaffgausskernelfromlambda12phi(
                   * pow(lambda1, 2) * sqrt(lambda1 * lambda2) * pi)
 
     if (phiorder == 1) and (orthorder == 1):
-        # ==>> The following code does not give the right result and needs to be replaced
-        return (-8 * cos(phi) * sin(phi) *  \
-            (-4 * lambda1 * pow(lambda2,2) * cos(phi)**2 + \
-             4 * pow(lambda2,2) * x**2 * pow(cos(phi),4) - \
-             8 * (lambda1 - lambda2) * lambda2 * x * y * pow(cos(phi),3) * sin(phi) - \
-             4 * pow(lambda1,2) * lambda2 * sin(phi)**2 - \
-             8 * lambda1 * (lambda1 - lambda2) * x * y * cos(phi) * pow(sin(phi),3) + \
-             4 * pow(lambda1,2) * x**2 * pow(sin(phi),4) + \
-             (pow(lambda1,2) * y**2 + pow(lambda2,2) * y**2 + \
-              2 * lambda1 * lambda2 * (x**2 - y**2)) * pow(sin(2 * phi),2)) + \
-            16 * cos(phi) * sin(phi) *  \
-            (-4 * pow(lambda1,2) * lambda2 * cos(phi)**2 + \
-             4 * pow(lambda1,2) * y**2 * pow(cos(phi),4) - \
-             8 * lambda1 * (lambda1 - lambda2) * x * y * pow(cos(phi),3) * sin(phi) - \
-             4 * lambda1 * pow(lambda2,2) * sin(phi)**2 - \
-             8 * (lambda1 - lambda2) * lambda2 * x * y * cos(phi) * pow(sin(phi),3) + \
-             4 * pow(lambda2,2) * y**2 * pow(sin(phi),4) + \
-             (pow(lambda1,2) * x**2 + pow(lambda2,2) * x**2 + \
-              2 * lambda1 * lambda2 * (-x**2 + y**2)) * pow(sin(2 * phi),2)) - \
-            pow(1 + cos(2 * phi) - 2 * sin(phi),2) *  \
-            (2 * pow(lambda1,2) * x * y + 4 * lambda1 * lambda2 * x * y \
-                 + 2 * pow(lambda2,2) * x * y - \
-             2 * pow(lambda1 - lambda2,2) * x * y * cos(4 * phi) + \
-             2 * (lambda1 - lambda2) * (lambda1 * (2 * lambda2 - x**2 - y**2) - \
-                                    lambda2 * (x**2 + y**2)) * sin(2 * phi) + \
-             pow(lambda1,2) * x**2 * sin(4 * phi) - \
-             2 * lambda1 * lambda2 * x**2 * sin(4 * phi) + \
-             pow(lambda2,2) * x**2 * sin(4 * phi) - \
-             pow(lambda1,2) * y**2 * sin(4 * phi) + \
-             2 * lambda1 * lambda2 * y**2 * sin(4 * phi) - \
-             pow(lambda2,2) * y**2 * sin(4 * phi)))/ \
-           (64 * np.power(E,((lambda2 * x**2 + lambda1 * y**2) * cos(phi)**2 + \
-                         (lambda1 * x**2 + lambda2 * y**2) * sin(phi)**2 - \
-                         (lambda1 - lambda2) * x * y * sin(2 * phi))/\
-                              (2 * lambda1 * lambda2)) *  \
-            pow(lambda1 * lambda2,2.5) * pi)
+        return - (lambda2 * (x * cos(phi) + y * sin(phi))) *\
+               (-2 * lambda1 * y * cos(phi) + 2 * lambda1 * x * sin(phi)) / \
+               (4 * np.power(E, \
+                            ((lambda2 * x**2 + lambda1 * y**2) * cos(phi)**2 + \
+                             (lambda1 * x**2 + lambda2 * y**2) * sin(phi)**2 - \
+                             (lambda1 - lambda2) * x * y * sin(2*phi)) \
+                            / (2 * lambda1 * lambda2)) \
+                  * pow(lambda1 * lambda2, 1.5) * pi)
 
     if (phiorder == 0) and (orthorder == 2):
         return (-2 * lambda2 + x**2 + y**2 + (-x**2 + y**2)*cos(2*phi) \

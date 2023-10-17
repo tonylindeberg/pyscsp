@@ -1,17 +1,16 @@
-"""*** Discrete Scale Space and Scale-Space Derivative Toolbox for PyTorch ***
+"""*** Scale Space Toolbox for PyTorch ***
 
-Extend parts of the discscsp package to PyTorch networks.
+Extend subsets of the discscsp and affscsp modules to PyTorch:
 
-For computing discrete scale-space smoothing by convolution with the discrete
+(discscp): For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
 by applying central difference operators to the smoothed data. 
 
-This code is the result of porting a subset of the routines in the Matlab packages
-discscsp and discscspders to Python.
-
-Note: The scale normalization does not explicitly compensate for the additional 
-variance 1/12 for the integrated Gaussian kernel or the additional variance 1/6
-for the linearly integrated Gaussian kernel at coarser scales.
+(affscsp) Functions for performing the equivalent effect of convolving an image with
+discrete approximations of directional derivatives of affine Gaussian
+kernels, including mechanisms for scale normalization as well as a mechanism
+for relative normalization of receptive field responses between different orders 
+of spatial diffentiation.
 
 References:
 
@@ -24,22 +23,6 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 
-Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
-networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
-
-
-*** Affine Scale-Space and Scale-Space Derivative Toolbox for Python ***
-
-Functions for performing the equivalent effect of convolving an image with
-a discrete approximations of directional derivatives of affine Gaussian
-kernel, including mechanisms for scale normalization as well as a mechanism
-for normalizing receptive field responses of different orders of spatial
-diffentiation.
-
-References:
-
-Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
-
 Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
 of 3-D depth cues from affine distortions of local 2-D structure",
 Image and Vision Computing 15: 415-434
@@ -49,6 +32,9 @@ Biological Cybernetics, 107(6): 589-635. (See Equation (69).)
 
 Lindeberg (2021) "Normative theory of visual receptive fields", 
 Heliyon 7(1): e05897: 1-20.
+
+Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
+networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 """
 
 import math
@@ -92,11 +78,11 @@ def make1Dgaussfilter(
     kernel is also equal to the sigma value. The current implementation of the this 
     filter in terms of modified Bessel functions of integer order is, however, not 
     supported in terms of existing PyTorch functions, implying that the choice 
-    of this method will not allow for scale adaptation by backprop.
+    of this method will not allow for scale adaptation by back propagation.
 
     For this reason, the alternative methods 'samplgauss', 'normsamplgauss, 'intgauss' 
     and 'linintgauss' are provided, with full implementations in terms of PyTorch
-    functions and thereby supporting scale adaptation by backprop.
+    functions and thereby supporting scale adaptation by back propagation.
 
     For these methods, there are the possible advantages (+) and disadvantages (-):
 
@@ -347,7 +333,7 @@ def makesamplaffgausskernel(
 
     References:
 
-    Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
+    Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
 
     Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
     of 3-D depth cues from affine distortions of local 2-D structure",

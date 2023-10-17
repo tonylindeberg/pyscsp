@@ -3,7 +3,7 @@
 For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
 by applying central difference operators to the smoothed data. Then, different
-types of feature detectors can be defined by combining discrete analogues of the
+types of feature detectors can be defined, by combining discrete analogues of the
 Gaussian derivative operators into differential expressions.
 
 This code is the result of porting a subset of the routines in the Matlab packages
@@ -39,11 +39,12 @@ Journal of Mathematical Imaging and Vision, 52(1): 3-36.
 
 Compared to the original Matlab code, the following implementation is reduced 
 in the following ways:
-- there is no handling of scale normalization powers gamma that are not equal to one
-- Lp-normalization is only implemented for p = 1
-- much fewer functions of the N-jet have so far been implemented
-- there is no passing of additional parameters to functions of the N-jet
-- this reimplementation has not yet been thoroughly tested
+
+- there is no handling of scale normalization powers gamma that are not equal to one,
+- Lp-normalization is only implemented for p = 1,
+- much fewer functions of the N-jet have so far been implemented,
+- there is no passing of additional parameters to functions of the N-jet,
+- this reimplementation has not yet been thoroughly tested.
 """
 from math import sqrt, exp, ceil, pi, cos, sin
 from typing import NamedTuple, Union, List
@@ -91,12 +92,13 @@ def scspconv(
         epsilon : float = 0.00000001
 ) -> np.ndarray :
     """Computes the scale-space representation of the 2-D image inpic (or a 1-D signal) 
-    at scale level sigma in units of the standard deviation of the Gaussian kernel that 
-    is approximated discretely with the method scspmethod and with the formally 
+    at scale level sigma in units of the standard deviation of the Gaussian kernel, 
+    that is approximated discretely with the method scspmethod, and with the formally 
     infinite convolution operation truncated at the tails with a relative approximation 
     error less than epsilon.
 
     The following discrete approximation methods have been implemented:
+
       'discgauss' - the discrete analogue of the Gaussian kernel
       'samplgauss' - the sampled Gaussian kernel
       'normsamplgauss' - the normalized sampled Gaussian kernel
@@ -840,6 +842,7 @@ def computeNjetfcn(
     the Gaussian kernel, and using the scale normalization method normdermethod.
 
     Implemented N-jet functions:
+
       'L' - smoothed scale-space representation
       'Lx' - 1:st-order partial derivative in x-direction
       'Ly' - 1:st-order partial derivative in y-direction
@@ -858,6 +861,7 @@ def computeNjetfcn(
       'Lq' - 1:st-order directional derivative in 2:nd principal curvature direction
       'Lpp' - 2:nd-order directional derivative in 1:st principal curvature direction
       'Lqq' - 2:nd-order directional derivative in 2:nd principal curvature direction
+
     In addition, 3:rd- and 4:th-order partial derivatives are also implemented.
 
     The differential expressions 'Lv', 'Lv2', 'Lv2Lvv' and 'Lv3Lvvv' are used in
@@ -898,6 +902,7 @@ def applyNjetfcn(
     method normdermethod.
 
     Implemented N-jet functions:
+
       'L' - smoothed scale-space representation
       'Lx' - 1:st-order partial derivative in x-direction
       'Ly' - 1:st-order partial derivative in y-direction
@@ -916,6 +921,8 @@ def applyNjetfcn(
       'Lq' - 1:st-order directional derivative in 2:nd principal curvature direction
       'Lpp' - 2:nd-order directional derivative in 1:st principal curvature direction
       'Lqq' - 2:nd-order directional derivative in 2:nd principal curvature direction
+
+    In addition, 3:rd- and 4:th-order partial derivatives are also implemented.
 
     The differential expressions 'Lv', 'Lv2', 'Lv2Lvv' and 'Lv3Lvvv' are used in
     methods for edge detection. The differential expressions 'Laplace', 'detHessian'
@@ -1545,6 +1552,8 @@ def variance(spatfilter : np.ndarray) -> np.ndarray:
         # Choose convention to fit deltafcn()
         y = np.linspace(-ysize/2, ysize/2-1, ysize)
 
+    y = -y
+
     xv, yv = np.meshgrid(x, y, indexing='xy')
 
     x2mom = np.sum(np.sum(xv * xv * spatfilter))/np.sum(np.sum(spatfilter))
@@ -1577,6 +1586,8 @@ def filtermean(spatfilter : np.ndarray) -> (float, float) :
     else:
         # Choose convention to fit deltafcn()
         y = np.linspace(-ysize/2, ysize/2-1, ysize)
+
+    y = -y
 
     xv, yv = np.meshgrid(x, y, indexing='xy')
 
@@ -1923,10 +1934,10 @@ def dphiphiphiphi_mask(phi : float) -> np.ndarray :
     See Equation (5.54) on page 139 in Lindeberg (1993) 
     "Scale-Space Theory in Computer Vision", Springer.
     """
-    return cos(phi)**4 * dxxxxmask5() + \
-           + 4*cos(phi)**3 * sin(phi) * dxxxymask5() \
-           + 6*cos(phi)**2 * sin(phi)**2 * dxxyymask5() \
-           + 4*cos(phi) * sin(phi)**2 * dxyyymask5() \
+    return cos(phi)**4 * dxxxxmask5() \
+           + 4 * cos(phi)**3 * sin(phi) * dxxxymask5() \
+           + 6 * cos(phi)**2 * sin(phi)**2 * dxxyymask5() \
+           + 4 * cos(phi) * sin(phi)**3 * dxyyymask5() \
            + sin(phi)**4 * dyyyymask5()
 
 
