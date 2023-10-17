@@ -1,7 +1,7 @@
 """Affine Scale-Space and Scale-Space Derivative Toolbox for Python
 
 For computing affine Gaussian kernels and affine Gaussian directional 
-derivative kernels,  as well as providing a computationally reasonably 
+derivative kernels, as well as providing a computationally reasonably 
 efficient way to compute filter banks of directional derivative responses 
 over different orders of spatial differentiation, by defining directional
 derivative approximation masks of small spatial support, which are to
@@ -140,7 +140,7 @@ def sampldirderaffgausskernelfromlambda12phi(
     Lindeberg (2021) "Normative theory of visual receptive fields", 
     Heliyon 7(1): e05897: 1-20. (See Equation (23)).
     """
-    # Generate a grid of coordinates
+    # Generate a grid of spatial coordinates
     xbase = np.linspace(-N, N, 2*N + 1)
     ybase = np.linspace(-N, N, 2*N + 1)
     ybase = - ybase
@@ -297,7 +297,7 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
     Sigma = [[Cxx, Cxy],
              [Cxy, Cyy]]
 
-    in represented by the parameterization
+    represented by the parameterization
 
     Cxx = sigma1^2 * cos(phi)**2 + sigma2^2 * sin(phi)**2
     Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
