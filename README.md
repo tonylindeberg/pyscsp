@@ -60,7 +60,7 @@ see the documentation strings for the respective functions in the source
 code in 
 [torchscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/torchscsp.py).
 
-## Installation
+## Installation:
 
 These modules can be installed using pip.
 
@@ -135,7 +135,7 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
-## Relations between the scientific papers and concepts in this code
+## Relations between the scientific papers and concepts in this code:
 
 The paper (Lindeberg 1990) describes the discrete analogue of the
 Gaussian kernel used for discrete implementation of Gaussian
@@ -152,7 +152,7 @@ approximations of Gaussian derivatives, provided that the scale-space
 smoothing operattion is performed using the discrete analogue of the
 Gaussian kernel.
 
-Chapters 3-5 in (Lindeberg 1993) give a more extensive treatment of
+Chapters 3-5 in the book (Lindeberg 1993b) give a more extensive treatment of
 discrete scale-space representation defined by convolution with the
 discrete analogue of the Gaussian kernel, including scale-space
 properties of discrete derivative approximations defined by applying
@@ -162,7 +162,7 @@ kernel. This treatment also describes theoretical properties of the
 sampled Gaussian kernel, the integrated Gaussian kernel and the
 linearily integrated Gaussian kernel.
 
-Chapter 14 in the book (Lindeberg 1993) and the paper
+Chapter 14 in the book (Lindeberg 1993b) and the paper
 (Lindeberg and Garding 1997) describe the notion of affine Gaussian
 scale space, with its closedness property under affine image
 transformations, referred to as affine covariance or affine equivariance.
