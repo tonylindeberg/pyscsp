@@ -59,7 +59,7 @@ def make1Dgaussfilter(
         scspmethod : str = 'discgauss',
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Generates a mask for discrete approximation of the Gaussian kernel 
     by separable filtering, using either of the methods:
 
@@ -142,7 +142,7 @@ def make1Dsamplgaussfilter(
         sigma : Union[float, torch.Tensor],
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the 
     sampled Gaussian kernel.
 
@@ -158,7 +158,7 @@ def make1Dsamplgaussfilter(
 def gauss(
         x : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes the 1-D Gaussian of a PyTorch tensor representing 1-D x-coordinates.
     """
     return 1/(math.sqrt(2*pi)*sigma)*torch.exp(-(x**2/(2*sigma**2)))
@@ -184,7 +184,7 @@ def make1Dintgaussfilter(
         sigma : torch.Tensor,
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the box integrated 
     Gaussian kernel over each pixel support region, according to Equation (3.89) on 
     page 97 in Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
@@ -200,7 +200,7 @@ def make1Dintgaussfilter(
 def scaled_erf(
         z : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes the scaled error function (as depending on a scale parameter sigma)
     of a PyTorch tensor representing 1-D x-coordinates.
     """
@@ -211,7 +211,7 @@ def make1Dlinintgaussfilter(
         sigma : torch.Tensor,
         epsilon : float = 0.01,
         D : int = 1
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes a 1D filter for separable discrete filtering with the linearly 
     integrated Gaussian kernel over each extended pixel support region.
 
@@ -232,7 +232,7 @@ def make1Dlinintgaussfilter(
 def x_scaled_erf(
         x : torch.Tensor,
         sigma : float = 1.0
-        ) -> torch.Tensor :
+    ) -> torch.Tensor :
     """Computes the product of the x-coordinate and scaled error function (as depending 
     on a scale parameter sigma) of a PyTorch tensor representing 1-D x-coordinates.
     """
@@ -311,10 +311,10 @@ def filtersdev(pytorchfilter : torch.tensor) -> float :
 
 
 def makesamplaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        N : int
     ) -> np.ndarray :
     """Computes a sampled affine Gaussian kernel of size N x N defined as
 
@@ -343,11 +343,11 @@ def makesamplaffgausskernel(
 
 
 def makescnormaffdirdermask(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
     application of this mask to an image that has been smoothed with a zero-order 
@@ -388,11 +388,11 @@ def makescnormaffdirdermask(
 
 
 def makeL1normaffdirdermask(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
     application of this mask to a zero-order affine Gaussian kernel gives an

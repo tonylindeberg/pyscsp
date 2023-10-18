@@ -45,9 +45,9 @@ from pyscsp.discscsp import dirdermask, normgaussder1D_L1norm
 
 
 def CxxCxyCyyfromlambda12phi(
-    lambda1 : float,
-    lambda2 : float,
-    phi : float
+        lambda1 : float,
+        lambda2 : float,
+        phi : float
     ) -> (float, float, float) :
     """Computes the parameters of spatial covariance matrix Sigma
 
@@ -70,9 +70,9 @@ def CxxCxyCyyfromlambda12phi(
 
 
 def CxxCxyCyyfromsigma12phi(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float
+        sigma1 : float,
+        sigma2 : float,
+        phi : float
     ) -> (float, float, float) :
     """Computes the parameters of spatial covariance matrix Sigma
 
@@ -95,12 +95,12 @@ def CxxCxyCyyfromsigma12phi(
 
 
 def sampldirderaffgausskernelfromlambda12phi(
-    lambda1 : float,
-    lambda2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        lambda1 : float,
+        lambda2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing the sampled directional
     derivative of order phiorder in the direction phi and of order orthorder
@@ -212,12 +212,12 @@ def sampldirderaffgausskernelfromlambda12phi(
 
 
 def sampldirderaffgausskernelfromsigma12phi(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing the sampled directional
     derivative of order phiorder in the direction phi and of order orthorder
@@ -265,12 +265,12 @@ def sampldirderaffgausskernelfromsigma12phi(
 
 
 def scnormsampldirderaffgausskernelfromsigma12phi(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing the sampled directional
     derivative of order phiorder in the direction phi and of order orthorder
@@ -320,12 +320,12 @@ def scnormsampldirderaffgausskernelfromsigma12phi(
 
 
 def numdirdersamplaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing a numerical approximation
     of the directional derivative of order phiorder in the direction phi and 
@@ -372,10 +372,10 @@ def numdirdersamplaffgausskernel(
 
 
 def samplaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        N : int
     ) -> np.ndarray :
     """Computes a sampled affine Gaussian kernel of size N x N defined as
 
@@ -404,11 +404,11 @@ def samplaffgausskernel(
 
 
 def scnormaffdirdermask(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
     application of this mask to an image smoothed by a zero-order affine Gaussian 
@@ -451,12 +451,12 @@ def scnormaffdirdermask(
 
 
 def scnormnumdirdersamplaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing the sampled directional
     derivative of order phiorder in the direction phi and of order orthorder
@@ -505,12 +505,12 @@ def scnormnumdirdersamplaffgausskernel(
 
 
 def L1normnumdirdersamplaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int,
-    N : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        N : int
     ) -> np.ndarray :
     """Computes a kernel of size N x N representing the sampled directional
     derivative of order phiorder in the direction phi and of order orthorder
@@ -562,11 +562,11 @@ def L1normnumdirdersamplaffgausskernel(
 
 
 def L1normaffdirdermask(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int
     ) -> np.ndarray :
     """Returns a discrete directional derivative approximation mask, such that
     application of this mask to a zero-order affine Gaussian kernel gives an
@@ -609,11 +609,11 @@ def L1normaffdirdermask(
 
 
 def L1norm_scnormdirderaffgausskernel(
-    sigma1 : float,
-    sigma2 : float,
-    phi : float,
-    phiorder : int,
-    orthorder : int
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int
     ) -> np.ndarray :
     """Computes the L1-norm of a scale-normalized affine Gaussian derivative kernel
     """
