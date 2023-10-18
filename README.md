@@ -2,7 +2,7 @@
 
 Contains the following modules:
 
-## discscsp: Discrete Scale-Space and Scale-Space Derivative Toolbox for Python:
+## discscsp : Discrete Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This module comprises:
 
@@ -26,7 +26,7 @@ approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in 
 [discscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/discscsp.py).
 
-## affscsp: Affine Scale-Space and Scale-Space Derivative Toolbox for Python:
+## affscsp : Affine Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This module comprises:
 
@@ -40,7 +40,7 @@ see the documentation strings for the respective functions in the source
 code in 
 [affscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/affscsp.py).
 
-## torchscsp: Subset of functionalities for use in PyTorch:
+## torchscsp : Subset of functionalities for use in PyTorch:
 
 This module comprises:
 
