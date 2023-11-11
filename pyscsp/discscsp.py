@@ -41,7 +41,6 @@ Compared to the original Matlab code, the following implementation is reduced
 in the following ways:
 
 - there is no handling of scale normalization powers gamma that are not equal to one,
-- Lp-normalization is only implemented for p = 1,
 - much fewer functions of the N-jet have so far been implemented,
 - there is no passing of additional parameters to functions of the N-jet,
 - this reimplementation has not been thoroughly tested.
@@ -68,13 +67,13 @@ class ScSpNormDerMethod(NamedTuple):
     underlying method for discrete approximation of the Gaussian smoothing operation.
     """
     scspmethod: ScSpMethod
-    normdermethod: str # either 'nonormalization', 'varnorm' or 'Lpnorm'
+    normdermethod: str # either 'nonormalization' or 'varnorm' 
     gamma: float
 
 
 def scspnormdermethodobject(
         scspmethod : str = 'discgauss',
-        normdermethod : str = 'Lpnorm',
+        normdermethod : str = 'varnorm',
         gamma : float = 1.0,
         epsilon : float = 0.00000001
     ) -> ScSpNormDerMethod :
@@ -835,7 +834,7 @@ def computeNjetfcn(
         inpic,
         njetfcn : str,
         sigma : float,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussvar'
     ) -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
     of the image inpic at scale level sigma in units of the standard deviation of
@@ -894,7 +893,7 @@ def applyNjetfcn(
         smoothpic : np.ndarray,
         njetfcn : str,
         sigma : float = 1.0,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussLp'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussvar'
     ) -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
     to an already computed scale-space representation at scale level sigma in units
@@ -1191,76 +1190,6 @@ def normderfactor(
         # ==>> requires a separate calibration for each scale value
         value = sigma**(xorder + yorder)
 
-    elif normdermethod.normdermethod == 'Lpnorm':
-        if normdermethod.scspmethod.methodname == 'discgauss':
-            if normdermethod.gamma == 1.0:
-                value = \
-                (normgaussder1D_L1norm(xorder, sigma) * \
-                normgaussder1D_L1norm(yorder, sigma)) / \
-                (discgaussder1D_L1norm(xorder, sigma, \
-                                      normdermethod.scspmethod.epsilon) * \
-                discgaussder1D_L1norm(yorder, sigma, \
-                                      normdermethod.scspmethod.epsilon))
-            else:
-                raise ValueError('Lp-normalization so far only implemented \
-for gamma = 1.0')
-
-        elif normdermethod.scspmethod.methodname == 'samplgauss':
-            if normdermethod.gamma == 1.0:
-                value = \
-                (normgaussder1D_L1norm(xorder, sigma) * \
-                normgaussder1D_L1norm(yorder, sigma)) / \
-                (samplgaussder1D_L1norm(xorder, sigma, \
-                                        normdermethod.scspmethod.epsilon) * \
-                samplgaussder1D_L1norm(yorder, sigma, \
-                                       normdermethod.scspmethod.epsilon))
-            else:
-                raise ValueError('Lp-normalization so far only implemented \
-for gamma = 1.0')
-
-        elif normdermethod.scspmethod.methodname == 'normsamplgauss':
-            if normdermethod.gamma == 1.0:
-                value = \
-                (normgaussder1D_L1norm(xorder, sigma) * \
-                normgaussder1D_L1norm(yorder, sigma)) / \
-                (normsamplgaussder1D_L1norm(xorder, sigma, \
-                                            normdermethod.scspmethod.epsilon) * \
-                 normsamplgaussder1D_L1norm(yorder, sigma, \
-                                            normdermethod.scspmethod.epsilon))
-            else:
-                raise ValueError('Lp-normalization so far only implemented \
-for gamma = 1.0')
-
-        elif normdermethod.scspmethod.methodname == 'intgauss':
-            if normdermethod.gamma == 1.0:
-                value = \
-                (normgaussder1D_L1norm(xorder, sigma) * \
-                normgaussder1D_L1norm(yorder, sigma)) / \
-                (intgaussder1D_L1norm(xorder, sigma, \
-                                      normdermethod.scspmethod.epsilon) * \
-                intgaussder1D_L1norm(yorder, sigma, \
-                                     normdermethod.scspmethod.epsilon))
-            else:
-                raise ValueError('Lp-normalization so far only implemented \
-for gamma = 1.0')
-
-        elif normdermethod.scspmethod.methodname == 'linintgauss':
-            if normdermethod.gamma == 1.0:
-                value = \
-                (normgaussder1D_L1norm(xorder, sigma) * \
-                normgaussder1D_L1norm(yorder, sigma)) / \
-                (linintgaussder1D_L1norm(xorder, sigma, \
-                                         normdermethod.scspmethod.epsilon) * \
-                linintgaussder1D_L1norm(yorder, sigma, \
-                                        normdermethod.scspmethod.epsilon))
-            else:
-                raise ValueError('Lp-normalization so far only implemented \
-for gamma = 1.0')
-
-        else:
-            raise ValueError(f'Lp-normalization not implemented for \
-scale-space derivative method {normdermethod.scspmethod.methodname}')
-
     else:
         raise ValueError(f'Derivative method {normdermethod.normdermethod} \
 not implemented')
@@ -1268,210 +1197,8 @@ not implemented')
     return value
 
 
-def normgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        gammapar : float = 1.0
-    ) -> float :
-    """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative 
-    of order sigma and at scale sigma in units of the standard deviation of 
-    the Gaussian kernel, using the scale normalization parameter gammapar.
-
-    Based on Equations (74)-(77) in Lindeberg (1998) "Feature Detection with 
-    Automatic Scale Selection", International Journal of Computer Vision,
-    30(2): 79-116, combined by gamma-normalization of the scale-normalized
-    derivatives according to Equation (6) in the same article.
-    """
-    s = sigma*sigma
-
-    if order == 0:
-        value = 1.0
-
-    elif order == 1:
-        value = sqrt(2/pi) * s**((gammapar - 1)/2)
-
-    elif order == 2:
-        value = 2*sqrt(2/(exp(1)*pi)) * s**(gammapar - 1)
-
-    elif order == 3:
-        value = (4 + exp(3/2))*sqrt(2/pi)/exp(3/2) * s**(3*(gammapar - 1)/2)
-
-    elif order == 4:
-        value = \
-          2*exp(-3/2 - sqrt(3/2)) * \
-          (2*exp(sqrt(6))*sqrt((9 - 3*sqrt(6))/pi) \
-               + 3*sqrt((3 - sqrt(6))/pi) \
-          + sqrt(6*(3 - sqrt(6))/pi) \
-          + sqrt(3*(3 + sqrt(6))/pi)) * s**(2*(gammapar - 1))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return value
-
-
-def discgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        epsilon : float = 0.00000001
-    ) -> float :
-    """Returns the L_1-norm of the n:th-order difference of the 1-D discrete analogue 
-    of the Gaussian kernel at scale level sigma in units of the standard deviation and 
-    truncated at the tails with a relative approximation error less than epsilon.
-    """
-    smoothkernel = make1Ddiscgaussfilter(sigma, epsilon, 1)
-
-    if order == 0:
-        derkernel = smoothkernel
-
-    elif order == 1:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
-
-    elif order == 2:
-        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
-
-    elif order == 3:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
-
-    elif order == 4:
-        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return sum(abs(derkernel))
-
-
-def samplgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        epsilon : float = 0.00000001
-    ) -> float :
-    """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
-    Gaussian kernel at scale level sigma in units of the standard deviation and 
-    truncated at the tails with a relative approximation error less than epsilon.
-    """
-    smoothkernel = make1Dsamplgaussfilter(sigma, epsilon, 1)
-
-    if order == 0:
-        derkernel = smoothkernel
-
-    elif order == 1:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
-
-    elif order == 2:
-        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
-
-    elif order == 3:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
-
-    elif order == 4:
-        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return sum(abs(derkernel))
-
-
-def normsamplgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        epsilon : float = 0.00000001
-    ) -> float :
-    """Returns the L_1-norm of the n:th-order difference of the 1-D sampled 
-    Gaussian kernel at scale level sigma in units of the standard deviation and 
-    truncated at the tails with a relative approximation error less than epsilon.
-    """
-    smoothkernel = make1Dnormsamplgaussfilter(sigma, epsilon, 1)
-
-    if order == 0:
-        derkernel = smoothkernel
-
-    elif order == 1:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
-
-    elif order == 2:
-        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
-
-    elif order == 3:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
-
-    elif order == 4:
-        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return sum(abs(derkernel))
-
-
-def intgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        epsilon : float = 0.00000001
-    ) -> float :
-    """Returns the L_1-norm of the n:th-order difference of the 1-D integrated 
-    Gaussian kernel at scale level sigma in units of the standard deviation and 
-    truncated at the tails with a relative approximation error less than epsilon.
-    """
-    smoothkernel = make1Dintgaussfilter(sigma, epsilon, 1)
-
-    if order == 0:
-        derkernel = smoothkernel
-
-    elif order == 1:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
-
-    elif order == 2:
-        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
-
-    elif order == 3:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
-
-    elif order == 4:
-        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return sum(abs(derkernel))
-
-
-def linintgaussder1D_L1norm(
-        order : int,
-        sigma : float,
-        epsilon : float = 0.00000001
-    ) -> float :
-    """Returns the L_1-norm of the n:th-order difference of the 1-D linearly 
-    integrated Gaussian kernel at scale level sigma in units of the standard deviation 
-    and truncated at the tails with a relative approximation error less than epsilon.
-    """
-    smoothkernel = make1Dlinintgaussfilter(sigma, epsilon, 1)
-
-    if order == 0:
-        derkernel = smoothkernel
-
-    elif order == 1:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 0, 1/2]))
-
-    elif order == 2:
-        derkernel = correlate1d(smoothkernel, np.array([1, -2, 1]))
-
-    elif order == 3:
-        derkernel = correlate1d(smoothkernel, np.array([-1/2, 1, 0, -1, 1/2]))
-
-    elif order == 4:
-        derkernel = correlate1d(smoothkernel, np.array([1, -4, 6, -4, 1]))
-
-    else:
-        raise ValueError(f'Not implemented for order {order}')
-
-    return sum(abs(derkernel))
-
-
 def defaultscspnormdermethodobject(
-        scspnormdermethod : str = 'discgaussLp',
+        scspnormdermethod : str = 'discgaussvar',
         gamma : float = 1.0
     ) -> ScSpNormDerMethod :
     """Converts a user-friendly string for a method for approximating 
@@ -1485,17 +1212,11 @@ def defaultscspnormdermethodobject(
     elif scspnormdermethod == 'discgaussvar':
         obj = scspnormdermethodobject('discgauss', 'varnorm', gamma)
 
-    elif scspnormdermethod == 'discgaussLp':
-        obj = scspnormdermethodobject('discgauss', 'Lpnorm', gamma)
-
     elif scspnormdermethod == 'samplgauss':
         obj = scspnormdermethodobject('samplgauss', 'nonormalization', gamma)
 
     elif scspnormdermethod == 'samplgaussvar':
         obj = scspnormdermethodobject('samplgauss', 'varnorm', gamma)
-
-    elif scspnormdermethod == 'samplgaussLp':
-        obj = scspnormdermethodobject('samplgauss', 'Lpnorm', gamma)
 
     elif scspnormdermethod == 'normsamplgauss':
         obj = scspnormdermethodobject('normsamplgauss', 'nonormalization', gamma)
@@ -1503,26 +1224,17 @@ def defaultscspnormdermethodobject(
     elif scspnormdermethod == 'normsamplgaussvar':
         obj = scspnormdermethodobject('normsamplgauss', 'varnorm', gamma)
 
-    elif scspnormdermethod == 'normsamplgaussLp':
-        obj = scspnormdermethodobject('normsamplgauss', 'Lpnorm', gamma)
-
     elif scspnormdermethod == 'intgauss':
         obj = scspnormdermethodobject('intgauss', 'nonormalization', gamma)
 
     elif scspnormdermethod == 'intgaussvar':
         obj = scspnormdermethodobject('intgauss', 'varnorm', gamma)
 
-    elif scspnormdermethod == 'intgaussLp':
-        obj = scspnormdermethodobject('intgauss', 'Lpnorm', gamma)
-
     elif scspnormdermethod == 'linintgauss':
         obj = scspnormdermethodobject('linintgauss', 'nonormalization', gamma)
 
     elif scspnormdermethod == 'linintgaussvar':
         obj = scspnormdermethodobject('linintgauss', 'varnorm', gamma)
-
-    elif scspnormdermethod == 'linintgaussLp':
-        obj = scspnormdermethodobject('linintgauss', 'Lpnorm', gamma)
 
     else:
         raise ValueError(f'Scale-space derivative method {scspnormdermethod} \
@@ -1674,16 +1386,6 @@ def applydirder(
     make use of scale-normalized derivatives, the parameter sigma should
     then describe the value of the spatial scale parameter used for spatial
     smoothing in units of the standard deviation of the kernel.
-
-    Note, however, that the computation of the scale normalization factor
-    for scale-normalized derivatives has only been implemented for variance-based
-    scale normalization. To perform Lp-normalization properly, a non-separable
-    2-D image filter would need to be computed, corresponding to the combined
-    effect of the discrete directional derivative approximation mask and
-    the spatial smoothing operation, which may consitute a significant
-    amount of computational work, compared to the actual work of performing
-    the linear filtering needed to apply the directional derivative approximation
-    mask, and has therefore not been immplemented.
 
     References:
 

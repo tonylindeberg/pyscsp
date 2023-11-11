@@ -50,7 +50,7 @@ from pyscsp.discscsp import gaussfiltsize, variance1D
 # ==>> for the discrete analogue of the Gaussian kernel
 from pyscsp.discscsp import make1Ddiscgaussfilter
 
-from pyscsp.affscsp import samplaffgausskernel, scnormaffdirdermask, L1normaffdirdermask
+from pyscsp.affscsp import samplaffgausskernel, scnormaffdirdermask
 
 
 def make1Dgaussfilter(
@@ -385,48 +385,3 @@ def makescnormaffdirdermask(
     """
     return torch.from_numpy( \
             scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)).type(torch.FloatTensor)
-
-
-def makeL1normaffdirdermask(
-        sigma1 : float,
-        sigma2 : float,
-        phi : float,
-        phiorder : int,
-        orthorder : int
-    ) -> np.ndarray :
-    """Returns a discrete directional derivative approximation mask, such that
-    application of this mask to a zero-order affine Gaussian kernel gives an
-    approximation of the scale-normalized directional derivative according to
-
-    C sigma1^phiorder sigma2^orthorder D_phi^phiorder D_orth^orthorder g(x; Sigma)
-
-    for
-
-    D_phi  =  cos phi D_x + sin phi D_y
-    D_orth = -sin phi D_x + cos phi D_y
-
-    where D_phi and D_orth represent the partial derivative operators in the 
-    directions phi and it orthogonal direction orth, respectively, where it
-    is assumed that convolution with g(x; Sigma), (with the covariance matrix 
-    Sigma, as specified using the same values of sigma1, sigma2 and phi), 
-    is computed outside of this function, and with the constant C determined 
-    such that the corresponding continuous kernel would have unit L1-norm.
-
-    The intention is that the mask returned by this function should be applied
-    to affine Gaussian smoothed images. Specifically, for an image processing
-    method that makes use of a filter bank of directional derivatives of 
-    affine Gaussian kernels, the intention is that the computationally heavy
-    affine Gaussian smoothing operation should be performed only once, and
-    that different directional derivative approximation masks should then
-    be applied to the same affine Gaussian smoothed image, thus saving
-    a substantial amount of work, compared to applying full size affine
-    Gaussian directional derivative masks for different choices of the orders
-    for the directional derivatives.
-
-    Reference:
-
-    Lindeberg (2021) "Normative theory of visual receptive fields", 
-    Heliyon 7(1): e05897: 1-20. (See Equation (31)).
-    """
-    return torch.from_numpy( \
-            L1normaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)).type(torch.FloatTensor)
