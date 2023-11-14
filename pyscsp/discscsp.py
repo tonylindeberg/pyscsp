@@ -834,7 +834,7 @@ def computeNjetfcn(
         inpic,
         njetfcn : str,
         sigma : float,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussvar'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss'
     ) -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
     of the image inpic at scale level sigma in units of the standard deviation of
@@ -893,7 +893,7 @@ def applyNjetfcn(
         smoothpic : np.ndarray,
         njetfcn : str,
         sigma : float = 1.0,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgaussvar'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss'
     ) -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
     to an already computed scale-space representation at scale level sigma in units
