@@ -135,6 +135,10 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
+Lindeberg (2023) "Discrete approximations of Gaussian smoothing and
+Gaussian derivatives", arXiv preprint arXiv:2311.11317.
+([preprint](https://doi.org/10.48550/arXiv.2311.11317))
+
 ## Relations between the scientific papers and concepts in this code:
 
 The paper (Lindeberg 1990) describes the discrete analogue of the
@@ -176,10 +180,7 @@ curvature operator (N-jet function 'Kappa'). This paper also defines
 the notion of gamma-normalized scale-space derivatives by multiplying
 the regular Gaussian derivative operators by the scale parameter s =
 sigma^2 raised to the power of gamma multiplied by the order of
-differentiation and divided by two, including a way to approximate this operator for 
-discrete image data based on lp-normalization of the derivative 
-operator, with the power p in the Lp-norms and lp-norms related to
-the scale normalization power gamma.
+differentiation and divided by two.
 
 The paper (Lindeberg 1998b) describes the differential definition of
 edge detection from local directional derivatives of the image
@@ -215,3 +216,10 @@ The paper (Lindeberg 2022) defines the notion of a Gaussian derivative
 layer, as a linear combination of scale-normalized Gaussian derivative
 responses, as a basic concept for defining provably scale-covariant
 and scale-invariant deep networks.
+
+The paper (Lindeberg 2023) gives an in-depth treatment of different
+ways of approximating the Gaussian smoothing operation and the
+Gaussian derivative operators that underlie the computation of
+scale-space features. In this respect, this paper provides a
+theoretical foundation for many of the implementations in
+the pyscsp package.
