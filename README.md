@@ -11,10 +11,20 @@ This module comprises:
 	 of the continuous Gaussian kernel, that is used for defining a Gaussian 
 	 scale-space representation.
 
+-- functions for computing discrete approximations of Gaussian
+	derivatives, based on first convolving the image data with the
+	discrete analogue of the Gaussian kernel, and then applying
+	small-support central difference operations to the spatial
+	smoothed image data.
+	
 -- functions for computing differential expressions in terms of scale-normalized
     Gaussian derivatives for different purposes in feature detection
     from image data, such as edge detection, interest point detection
-    (blob detection or corner detection) and ridge detection.
+    (blob detection or corner detection) and ridge detection, based on
+    the above discrete derivative approximations obtained by applying
+    small-support central difference operations to spatially smoothed
+    image data obtained by convolving the input image with the
+    discrete analogue of the Gaussian kernel.
 	
 For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
@@ -30,10 +40,15 @@ strings for the respective functions in the source code in
 
 This module comprises:
 
--- functions for computing affine Gaussian kernels and affine Gaussian
-directional derivative approximation masks, which can be used for compute 
-the responses of filter banks of directional derivative responses over different orders of 
-spatial differentiation.
+-- functions for computing discrete approximations of affine Gaussian
+	kernels and affine Gaussian directional derivative approximation
+	masks, which can be used for computing the responses of filter
+	banks of  directional derivative responses over different orders of 
+	spatial differentiation and over different image orientations.
+
+For examples of how to apply these functions for computing scale-space
+features, please see the enclosed Jupyter notebook 
+[affscspdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/affscspdemo.py).
 
 For more technical descriptions about the respective functions, please
 see the documentation strings for the respective functions in the source
@@ -48,8 +63,7 @@ This module comprises:
      for spatial smoothing with separable filtering in PyTorch,
 	 
 -- discrete derivative approximation masks for computing discrete approximations
-     of Gaussian derivatives and Gaussian derivative layers in
-     PyTorch, and
+     of Gaussian derivatives and Gaussian derivative layers in PyTorch.
 
 -- functions for generating affine Gaussian kernels and scale-normalized discrete
    directional derivative approximation masks, which can be used for computing the responses to
