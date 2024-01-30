@@ -38,10 +38,10 @@ directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
 """
 
-from math import exp, pi, sqrt, cos, sin
+from math import exp, pi, sqrt, cos, sin, ceil
 import numpy as np
 from scipy.ndimage import correlate
-from pyscsp.discscsp import dirdermask
+from pyscsp.discscsp import dirdermask, truncerrtransf, gaussfiltsize
 
 
 def CxxCxyCyyfromlambda12phi(
@@ -403,6 +403,65 @@ def samplaffgausskernel(
     return sampldirderaffgausskernelfromsigma12phi(sigma1, sigma2, phi, 0, 0, N)
 
 
+def samplaffgaussconv(
+        inpic,
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        epsilon : int = 0.0001
+    ) -> np.ndarray :
+    """Convolves the input image inpic sampled affine Gaussian kernel defined as
+
+    g(x; Sigma) = 1/(2 * pi * det Sigma) * exp(-x^T Sigma^(-1) x/2)
+
+    with the covariance matrix 
+    
+    Sigma = [[Cxx, Cxy],
+             [Cxy, Cyy]]
+
+    parameterized as
+
+    Cxx = sigma1^2 * cos(phi)^2 + sigma2^2 * sin(phi)^2
+    Cxy = (sigma1^2 - sigma2^2) * cos(phi) * sin(phi)
+    Cyy = sigma1^2 * sin(phi)^2 + sigma2^2 * cos(phi)^2
+    
+    and given a bound epsilon on the truncation error at the boundaries,
+    if the smoothing kernel is truncated at the tails.
+    """
+    # Estimate a size for truncating the Gaussian derivative kernels
+    N = N_from_epsilon_2D(0, max(sigma1, sigma2), epsilon)
+
+    affgaussfilter = samplaffgausskernel(sigma1, sigma2, phi, N)
+
+    return correlate(inpic, affgaussfilter)
+
+
+def applyaffdirder(
+        smoothpic,
+        sigma1 : float,
+        sigma2 : float,
+        phi : float,
+        phiorder : int,
+        orthorder : int,
+        normdermethod = 'varnorm'
+    ) -> np.ndarray :
+    """Applies a directional derivative operator of order phiorder in the direction
+    phi and of order orthorder in the orthogonal direction, to an image that is
+    assumed to have been smoothed with an affine Gaussian kernel with standard
+    deviation sigma1 in the direction phi and standard deviation orthorder
+    in the orthogonal direction, where the parameter normdermethod specifies
+    the type of scale normalization to be used for the affine Gaussian derivatives.
+    """
+    if normdermethod == 'varnorm':
+        mask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
+    elif normdermethod == 'nonormalization':
+        mask = dirdermask(phi, phiorder, orthorder)
+    else:
+        raise ValueError(f"Scale normalization method {normdermethod} not implemented")
+
+    return correlate(smoothpic, mask)
+
+
 def scnormaffdirdermask(
         sigma1 : float,
         sigma2 : float,
@@ -502,3 +561,42 @@ def scnormnumdirdersamplaffgausskernel(
     scnormmask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 
     return correlate(affgausskernel, scnormmask)
+
+
+## ==>> Preliminary inclusion of this function
+def N_from_epsilon_2D(
+        order : int,
+        sigma : float,
+        epsilon : float
+    ) -> int :
+    """Computes an estimate of a minimum bound N for truncating a Gaussian
+    derivative kernel of a given order to ensure that the relative truncation 
+    error for 2-D Gaussian derivative convolution is below epsilon.
+    """
+    # Convert the 2-D error bound for a 1-D error bound for separable convolution
+    eps1D = truncerrtransf(epsilon, 2)
+
+    return N_from_epsilon_1D(order, sigma, eps1D)
+
+
+def N_from_epsilon_1D(
+        order : int,
+        sigma : float,
+        epsilon : float
+    ) -> int :
+    """Computes an estimate of a minimum bound N for truncating a Gaussian
+    derivative kernel of a given order to ensure that the relative truncation 
+    error for 1-D Gaussian derivative convolution is below epsilon.
+    """
+    if order == 0:
+        return ceil(gaussfiltsize(sigma, epsilon, 1))
+
+    # ==>> Preliminary solution to be similar to corresponding error estimates
+    # ==>> for the discrete approximations to Gaussian derivative responsens
+    # ==>> computed by applying small-support discrete derivative approximation
+    # ==>> molecules to the result of discrete scale-space smoothing
+    return 1 + order + ceil(gaussfiltsize(sigma, epsilon / 2**order, 1))
+
+
+
+
