@@ -118,7 +118,7 @@ Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 Lindeberg (1994) "Scale-space theory: A basic tool for analysing
 structures at different scales", Journal of Applied Statistics 21(2):
 224-270.
-([Online preprint](http://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A457189&dswid=7387))
+([preprint](http://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A457189&dswid=7387))
 
 Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
 of 3-D depth cues from affine distortions of local 2-D structure",
