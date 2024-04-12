@@ -185,7 +185,7 @@ kernel. This treatment also describes theoretical properties of the
 sampled Gaussian kernel, the integrated Gaussian kernel and the
 linearily integrated Gaussian kernel.
 
-The paper (Lindeberg 1994) gives a comprehensive overview over the
+The paper (Lindeberg 1994) gives a comprehensive general overview over the
 notion of Gaussian scale-space representation.
 
 Chapter 14 in the book (Lindeberg 1993b) and the paper
