@@ -115,6 +115,11 @@ A basis for low-level feature detection", Journal of Mathematical Imaging and Vi
 Lindeberg (1993b) Scale-Space Theory in Computer Vision, Springer.
 ([Online edition](http://dx.doi.org/10.1007/978-1-4757-6465-9))
 
+Lindeberg (1994) "Scale-space theory: A basic tool for analysing
+structures at different scales", Journal of Applied Statistics 21(2):
+224-270.
+([Online preprint](http://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A457189&dswid=7387))
+
 Lindeberg and Garding (1997) "Shape-adapted smoothing in estimation 
 of 3-D depth cues from affine distortions of local 2-D structure",
 Image and Vision Computing 15: 415-434
@@ -179,6 +184,9 @@ defined by convolution with the discrete analogue of the Gaussian
 kernel. This treatment also describes theoretical properties of the
 sampled Gaussian kernel, the integrated Gaussian kernel and the
 linearily integrated Gaussian kernel.
+
+The paper (Lindeberg 1994) gives a comprehensive overview over the
+notion of Gaussian scale-space representation.
 
 Chapter 14 in the book (Lindeberg 1993b) and the paper
 (Lindeberg and Garding 1997) describe the notion of affine Gaussian
