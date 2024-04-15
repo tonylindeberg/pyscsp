@@ -254,7 +254,7 @@ the pyscsp package.
 Remark: To avoid possible misunderstandings, this pyscsp package does
 not contain the full implementations needed to reproduce the methods
 in the above papers, only a subset of basic functionalities regarding
-the first layer of computation on the image data.
+the first layer of computations on the image data.
 
 The original implementations for most of the above papers have been
 performed in C or Matlab. Only for the papers (Lindeberg 2022) and
