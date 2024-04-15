@@ -262,6 +262,6 @@ performed in C or Matlab. Only for the papers (Lindeberg 2022) and
 implementations.
 
 The more general set of references listed here is, however, provided
-to point to the wider context in which the basic functions in the
+to point to a wider context in which the basic functions in the
 pyscsp package can be used.
 
