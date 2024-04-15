@@ -137,9 +137,14 @@ Lindeberg (2009) "Scale-space". In: B. Wah (Ed.) Wiley Encyclopedia of Computer
 Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 ([preprint](https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A441147&dswid=2409))
 
-Lindeberg (2013) "A computational theory of visual receptive fields", 
+Lindeberg (2013a) "A computational theory of visual receptive fields", 
 Biological Cybernetics, 107(6): 589-635.
 ([Open Access](https://doi.org/10.1007/s00422-013-0569-z))
+
+Lindeberg (2013b) "Scale selection properties of generalized
+scale-space interest point detectors", Journal of Mathematical
+Imaging and Vision, 46(2): 177-210.
+([Open Access](https://doi.org/10.1007/s10851-012-0378-3))
 
 Lindeberg (2015) "Image matching using generalized scale-space
 interest points", Journal of Mathematical Imaging and Vision, 52(1):
@@ -219,7 +224,7 @@ different types of differential invariants in scale-space (in this
 code referred to as N-jet functions) can be used for basic purposes of
 detecting image features in image data.
 
-The papers (Lindeberg 2013) and (Lindeberg 2021) demonstrate how
+The papers (Lindeberg 2013a) and (Lindeberg 2021) demonstrate how
 the spatial component of the receptive fields of simple cells in
 the primary visual cortex can be well modelled by directional
 derivatives of affine Gaussian kernels. In the code below, we
@@ -227,7 +232,7 @@ provide functions for generating such kernels corresponding to
 directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
 
-The paper (Lindeberg 2015) gives a more modern treatment of some of
+The papers (Lindeberg 2013b, Lindeberg 2015) give a more modern treatment of some of
 the concepts described in (Lindeberg 1998a), regarding the use of
 spatial extrema of the Laplacian operator (N-jet function 'Laplace'),
 the determinant of the Hessian operator (N-jet function 'detHessian')
