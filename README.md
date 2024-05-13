@@ -272,8 +272,8 @@ in the above papers, only a subset of basic functionalities regarding
 the first layer of computations on the image data.
 
 The original implementations for most of the above papers have been
-performed in C or Matlab. Only for the papers (Lindeberg 2022) and
-(Lindeberg 2023), the experimental work has been based on Python
+performed in C or Matlab. Only for the papers (Lindeberg 2022),
+(Lindeberg 2023) and (Lindeberg 2024), the experimental work has been based on Python
 implementations.
 
 The more general set of references listed here is, however, provided
