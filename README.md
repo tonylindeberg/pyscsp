@@ -163,6 +163,10 @@ Lindeberg (2023) "Discrete approximations of Gaussian smoothing and
 Gaussian derivatives", arXiv preprint arXiv:2311.11317.
 ([preprint](https://doi.org/10.48550/arXiv.2311.11317))
 
+Lindeberg (2024) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", arXiv preprint arXiv:2405.05095.
+([preprint](https://doi.org/10.48550/arXiv.2405.05095))
+
+
 ## Relations between the scientific papers and concepts in this code:
 
 The paper (Lindeberg 1990) describes the discrete analogue of the
