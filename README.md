@@ -255,6 +255,17 @@ scale-space features. In this respect, this paper provides a
 theoretical foundation for many of the implementations in
 the pyscsp package.
 
+The paper (Lindeberg 2024) extends the treatment of discrete
+approximations of Gaussian derivative operators to a characterization
+of properties of the hybrid discretization methods, based on
+combinations of a first stage of spatial smoothing, with either the
+normalized sampled Gaussian kernel or the integrated Gaussian kernel,
+followed by central differences. These discretization methods are
+computationally more efficient in situations when multiple derivatives
+of different orders are to be computed at the same scale level,
+compared to explicit convolutions with either sampled Gaussian
+derivative kernels or integrated Gaussian derivative kernels. 
+
 Remark: To avoid possible misunderstandings, this pyscsp package does
 not contain the full implementations needed to reproduce the methods
 in the above papers, only a subset of basic functionalities regarding
