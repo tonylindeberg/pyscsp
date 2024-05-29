@@ -17,7 +17,7 @@ for the linearly integrated Gaussian kernel at coarser scales.
 References:
 
 Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+Pattern Analysis and Machine Intelligence, 12(3): 234-254.
 
 Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
 A basis for low-level feature detection", Journal of Mathematical Imaging and 
@@ -37,14 +37,17 @@ Science and Engineering, John Wiley & Sons, pp. 2495-2504.
 Lindeberg (2015) "Image matching using generalized scale-space interest points", 
 Journal of Mathematical Imaging and Vision, 52(1): 3-36.
 
+Limitations:
+
 Compared to the original Matlab code, the following implementation is reduced 
 in the following ways:
 
-- there is no handling of scale normalization powers gamma that are not equal to one,
 - much fewer functions of the N-jet have so far been implemented,
 - there is no passing of additional parameters to functions of the N-jet,
 - this reimplementation has not been thoroughly tested.
 """
+
+
 from math import sqrt, exp, ceil, pi, cos, sin
 from typing import NamedTuple, Union, List
 import numpy as np
@@ -67,21 +70,19 @@ class ScSpNormDerMethod(NamedTuple):
     underlying method for discrete approximation of the Gaussian smoothing operation.
     """
     scspmethod: ScSpMethod
-    normdermethod: str # either 'nonormalization' or 'varnorm' 
-    gamma: float
+    normdermethod: str # either 'nonormalization' or 'varnorm'
 
 
 def scspnormdermethodobject(
         scspmethod : str = 'discgauss',
         normdermethod : str = 'varnorm',
-        gamma : float = 1.0,
         epsilon : float = 0.00000001
     ) -> ScSpNormDerMethod :
     """Creates an object that contains the parameters of discretization method
     for computing scale-normalized derivatives, with default values for a preferred 
     choice.
     """
-    return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod, gamma)
+    return ScSpNormDerMethod(ScSpMethod(scspmethod, epsilon), normdermethod)
 
 
 def scspconv(
@@ -121,17 +122,19 @@ def scspconv(
                 + the kernel values are guaranteed to sum to 1 over an infinite domain
                 + no scale offset at all in the spatial discretization
 
-    'samplgauss' + no added scale offset in the spatial discretization
+    'samplgauss' + good approx of continuous model for sufficiently large scale values
+                 + no added scale offset in the spatial discretization
                  - the kernel values may become greater than 1 for small values of sigma
                  - the kernel values do not sum up to one
-                 - for very small values of sigma the kernels have too narrow shape
+                 - for very small values of sigma, the kernels have a too narrow shape
 
     'normsamplgauss' + no added scale offset in the spatial discretization
                      + formally the kernel values are guaranteed to be in the 
                        interval [0, 1]
                      + formally the kernel values are guaranteed to sum up to 1 
                      - the complementary normalization of the kernel is ad hoc
-                     - for very small values of sigma the kernels have too narrow shape
+                     - for very small values of sigma, the kernels have a too narrow 
+                       shape
 
     'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
                + the kernel values are guaranteed to sum up to 1 over an infinite domain
@@ -294,8 +297,8 @@ def discgaussconv(
     values do also in the ideal infinite case exactly sum up to one, and are
     also confined in the interval [0, 1].
 
-    Reference: Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-    Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+    Reference: Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions 
+    on Pattern Analysis and Machine Intelligence, 12(3): 234-254.
     """
     ndim = inpic.ndim
     sep1Dfilter = make1Ddiscgaussfilter(sigma, epsilon, ndim)
@@ -354,13 +357,15 @@ def samplgaussconv(
     The transformation between adjacent scale levels is, however, not guaranteed to
     be a scale-space transformation.
 
-    Note also that for smaller values of sigma, the kernel values may go outside the
-    interval [0, 1], which is not a desirable property.
+    For sufficiently large values of the scale parameter, the sampled Gaussian kernel
+    leads to good approximations of the continuous scale-space model. For smaller values 
+    of sigma, the kernel values do not, however, sum to one, and they may even go 
+    outside the interval [0, 1], which are not a desirable properties.
 
     For a theoretical explanations of these properties, see Section VII.A in
 
     Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-    Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+    Pattern Analysis and Machine Intelligence, 12(3): 234-254.
 
     or Section 3.6.1 in
 
@@ -435,7 +440,7 @@ def normsamplgaussconv(
     Gaussian kernel, see Section VII.A in
 
     Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-    Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+    Pattern Analysis and Machine Intelligence, 12(3): 234-254.
 
     or Section 3.6.1 in
 
@@ -834,7 +839,8 @@ def computeNjetfcn(
         inpic,
         njetfcn : str,
         sigma : float,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss',
+        gamma : float = 1.0
     ) -> np.ndarray :
     """Computes an N-jet function in terms of scale-normalized Gaussian derivatives 
     of the image inpic at scale level sigma in units of the standard deviation of
@@ -886,14 +892,15 @@ def computeNjetfcn(
 
     smoothpic = scspconv(inpic, sigma, normdermethod.scspmethod)
 
-    return applyNjetfcn(smoothpic, njetfcn, sigma, normdermethod)
+    return applyNjetfcn(smoothpic, njetfcn, sigma, normdermethod, gamma)
 
 
 def applyNjetfcn(
         smoothpic : np.ndarray,
         njetfcn : str,
         sigma : float = 1.0,
-        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss'
+        normdermethod : Union[str, ScSpNormDerMethod] = 'discgauss',
+        gamma : float = 1.0
     ) -> np.ndarray :
     """Applies an N-jet function in terms of scale-normalized Gaussian derivatives 
     to an already computed scale-space representation at scale level sigma in units
@@ -951,113 +958,113 @@ def applyNjetfcn(
             outpic = smoothpic
 
         elif njetfcn == 'Lx':
-            outpic = normderfactor(1, 0, sigma, normdermethod) * \
+            outpic = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxmask())
 
         elif njetfcn == 'Ly':
-            outpic = normderfactor(0, 1, sigma, normdermethod) * \
+            outpic = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dymask())
 
         elif njetfcn == 'Lxx':
-            outpic = normderfactor(2, 0, sigma, normdermethod) * \
+            outpic = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxmask())
 
         elif njetfcn == 'Lxy':
-            outpic = normderfactor(1, 1, sigma, normdermethod) * \
+            outpic = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxymask())
 
         elif njetfcn == 'Lyy':
-            outpic = normderfactor(0, 2, sigma, normdermethod) * \
+            outpic = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dyymask())
 
         elif njetfcn == 'Lv':
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
             outpic = np.sqrt(Lx*Lx + Ly*Ly)
 
         elif njetfcn == 'Lv2':
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
             outpic = Lx*Lx + Ly*Ly
 
         elif njetfcn == 'Laplace':
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = Lxx + Lyy
 
         elif njetfcn == 'detHessian':
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = Lxx*Lyy - Lxy*Lxy
 
         elif njetfcn == 'sqrtdetHessian':
             # Signed square root of absolute value of the determinant of the Hessian
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             detHessian = Lxx*Lyy - Lxy*Lxy
             outpic = np.sign(detHessian) * np.sqrt(np.abs(detHessian))
 
         elif njetfcn == 'Kappa':
             # Rescaled level curve curvature
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = Ly*Ly*Lxx + Lx*Lx*Lyy - 2*Lx*Ly*Lxy
 
         elif njetfcn == 'Lv2Lvv':
             # 2nd-order derivative in gradient direction (used for edge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = Lx*Lx*Lxx + 2*Lx*Ly*Lxy + Ly*Ly*Lyy
 
         elif njetfcn == 'Lv3Lvvv':
             # 3rd-order derivative in gradient direction (used for edge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
-            Lxxx = normderfactor(3, 0, sigma, normdermethod) * \
+            Lxxx = normderfactor(3, 0, sigma, normdermethod, gamma) * \
                    correlate(smoothpic, dxxxmask())
-            Lxxy = normderfactor(2, 1, sigma, normdermethod) * \
+            Lxxy = normderfactor(2, 1, sigma, normdermethod, gamma) * \
                    correlate(smoothpic, dxxymask())
-            Lxyy = normderfactor(1, 2, sigma, normdermethod) * \
+            Lxyy = normderfactor(1, 2, sigma, normdermethod, gamma) * \
                    correlate(smoothpic, dxyymask())
-            Lyyy = normderfactor(0, 3, sigma, normdermethod) * \
+            Lyyy = normderfactor(0, 3, sigma, normdermethod, gamma) * \
                    correlate(smoothpic, dyyymask())
             outpic = Lx*Lx*Lx*Lxxx + 3*Lx*Lx*Ly*Lxxy + \
                      3*Lx*Ly*Ly*Lxyy + Ly*Ly*Ly*Lyyy
@@ -1065,15 +1072,15 @@ def applyNjetfcn(
         elif njetfcn == 'Lp':
             # 1st-order derivative in first principal curvature direction
             # (used for ridge detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             tmp = (Lxx - Lyy) /(np.finfo(float).eps + \
                                 np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
@@ -1084,15 +1091,15 @@ def applyNjetfcn(
         elif njetfcn == 'Lq':
             # 1st-order derivative in second principal curvature
             # (used for valley detection)
-            Lx = normderfactor(1, 0, sigma, normdermethod) * \
+            Lx = normderfactor(1, 0, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dxmask())
-            Ly = normderfactor(0, 1, sigma, normdermethod) * \
+            Ly = normderfactor(0, 1, sigma, normdermethod, gamma) * \
                  correlate(smoothpic, dymask())
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             tmp = (Lxx - Lyy) /(np.finfo(float).eps + \
                                 np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))
@@ -1103,11 +1110,11 @@ def applyNjetfcn(
         elif njetfcn == 'Lpp':
             # 2nd-order derivative in first principal curvature direction
             # (used for ridge detection)
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = ((Lxx + Lyy) - \
                       np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
@@ -1115,49 +1122,49 @@ def applyNjetfcn(
         elif njetfcn == 'Lqq':
             # 2nd-order derivative in second principal curvature direction
             # (used for valley detection)
-            Lxx = normderfactor(2, 0, sigma, normdermethod) * \
+            Lxx = normderfactor(2, 0, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxxmask())
-            Lxy = normderfactor(1, 1, sigma, normdermethod) * \
+            Lxy = normderfactor(1, 1, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dxymask())
-            Lyy = normderfactor(0, 2, sigma, normdermethod) * \
+            Lyy = normderfactor(0, 2, sigma, normdermethod, gamma) * \
                   correlate(smoothpic, dyymask())
             outpic = ((Lxx + Lyy) + \
                       np.sqrt((Lxx - Lyy)*(Lxx - Lyy) + 4*Lxy*Lxy))/2
 
         elif njetfcn == 'Lxxx':
-            outpic = normderfactor(3, 0, sigma, normdermethod) * \
+            outpic = normderfactor(3, 0, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxxmask())
 
         elif njetfcn == 'Lxxy':
-            outpic = normderfactor(2, 1, sigma, normdermethod) * \
+            outpic = normderfactor(2, 1, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxymask())
 
         elif njetfcn == 'Lxyy':
-            outpic = normderfactor(1, 2, sigma, normdermethod) * \
+            outpic = normderfactor(1, 2, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxyymask())
 
         elif njetfcn == 'Lyyy':
-            outpic = normderfactor(0, 3, sigma, normdermethod) * \
+            outpic = normderfactor(0, 3, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dyyymask())
 
         elif njetfcn == 'Lxxxx':
-            outpic = normderfactor(4, 0, sigma, normdermethod) * \
+            outpic = normderfactor(4, 0, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxxxmask())
 
         elif njetfcn == 'Lxxxy':
-            outpic = normderfactor(3, 1, sigma, normdermethod) * \
+            outpic = normderfactor(3, 1, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxxymask())
 
         elif njetfcn == 'Lxxyy':
-            outpic = normderfactor(2, 2, sigma, normdermethod) * \
+            outpic = normderfactor(2, 2, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxxyymask())
 
         elif njetfcn == 'Lxyyy':
-            outpic = normderfactor(1, 3, sigma, normdermethod) * \
+            outpic = normderfactor(1, 3, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dxyyymask())
 
         elif njetfcn == 'Lyyyy':
-            outpic = normderfactor(0, 4, sigma, normdermethod) * \
+            outpic = normderfactor(0, 4, sigma, normdermethod, gamma) * \
                      correlate(smoothpic, dyyyymask())
 
         else:
@@ -1170,7 +1177,8 @@ def normderfactor(
         xorder : int,
         yorder : int,
         sigma : float,
-        normdermethod : Union[str, ScSpNormDerMethod]
+        normdermethod : Union[str, ScSpNormDerMethod],
+        gamma : float = 1.0
     ) -> float :
     """Compute the scale normalization factor for the scale-normalied 
     Gaussian derivative of order xorder in the x-direction and of order yorder 
@@ -1188,7 +1196,7 @@ def normderfactor(
         # ==>> for the integrated or linearly integrated Gaussian kernels.
         # ==>> That added variance is, however, scale-dependent, which then
         # ==>> requires a separate calibration for each scale value
-        value = sigma**(xorder + yorder)
+        value = sigma**(gamma*(xorder + yorder))
 
     else:
         raise ValueError(f'Derivative method {normdermethod.normdermethod} \
@@ -1197,9 +1205,65 @@ not implemented')
     return value
 
 
+def normgaussder1D_L1norm(
+        order : int,
+        sigma : float,
+        gammapar : float = 1.0
+    ) -> float :
+    """Returns the L_1-norm of 1-D gamma-normalized Gaussian derivative 
+    of order sigma and at scale sigma in units of the standard deviation of 
+    the Gaussian kernel, using the scale normalization parameter gammapar.
+
+    Based on Equations (74)-(77) in Lindeberg (1998) "Feature Detection with 
+    Automatic Scale Selection", International Journal of Computer Vision,
+    30(2): 79-116, combined by gamma-normalization of the scale-normalized
+    derivatives according to Equation (6) in the same article.
+    """
+    s = sigma*sigma
+
+    if order == 0:
+        value = 1.0
+
+    elif order == 1:
+        value = sqrt(2/pi) * s**((gammapar - 1)/2)
+
+    elif order == 2:
+        value = 2*sqrt(2/(exp(1)*pi)) * s**(gammapar - 1)
+
+    elif order == 3:
+        value = (4 + exp(3/2)) * sqrt(2/pi) / exp(3/2) * s**(3*(gammapar - 1)/2)
+
+    elif order == 4:
+        value = \
+          2*exp(-3/2 - sqrt(3/2)) * \
+          (2*exp(sqrt(6))*sqrt((9 - 3*sqrt(6))/pi) \
+               + 3*sqrt((3 - sqrt(6))/pi) \
+          + sqrt(6*(3 - sqrt(6))/pi) \
+          + sqrt(3*(3 + sqrt(6))/pi)) * s**(2*(gammapar - 1))
+
+    else:
+        raise ValueError(f'Not implemented for order {order}')
+
+    return value
+
+
+def Lpnorm(
+        discfilter : np.ndarray,
+        p : float
+    ) -> float :
+    """Computes the lp-norm of a discrete filter"""
+
+    return (np.sum(np.abs(discfilter))**p)**(1/p)
+
+
+def L1norm(discfilter : np.ndarray) -> float :
+    """Computes the l1-norm of a discrete filter"""
+
+    return np.sum(np.abs(discfilter))
+
+
 def defaultscspnormdermethodobject(
-        scspnormdermethod : str = 'discgaussvar',
-        gamma : float = 1.0
+        scspnormdermethod : str = 'discgaussvar'
     ) -> ScSpNormDerMethod :
     """Converts a user-friendly string for a method for approximating 
     scale-normalized derivatives for discrete data to a class object, including 
@@ -1207,34 +1271,34 @@ def defaultscspnormdermethodobject(
     approximation of the underlying spatial smoothing operation
     """
     if scspnormdermethod == 'discgauss':
-        obj = scspnormdermethodobject('discgauss', 'nonormalization', gamma)
+        obj = scspnormdermethodobject('discgauss', 'nonormalization')
 
     elif scspnormdermethod == 'discgaussvar':
-        obj = scspnormdermethodobject('discgauss', 'varnorm', gamma)
+        obj = scspnormdermethodobject('discgauss', 'varnorm')
 
     elif scspnormdermethod == 'samplgauss':
-        obj = scspnormdermethodobject('samplgauss', 'nonormalization', gamma)
+        obj = scspnormdermethodobject('samplgauss', 'nonormalization')
 
     elif scspnormdermethod == 'samplgaussvar':
-        obj = scspnormdermethodobject('samplgauss', 'varnorm', gamma)
+        obj = scspnormdermethodobject('samplgauss', 'varnorm')
 
     elif scspnormdermethod == 'normsamplgauss':
-        obj = scspnormdermethodobject('normsamplgauss', 'nonormalization', gamma)
+        obj = scspnormdermethodobject('normsamplgauss', 'nonormalization')
 
     elif scspnormdermethod == 'normsamplgaussvar':
-        obj = scspnormdermethodobject('normsamplgauss', 'varnorm', gamma)
+        obj = scspnormdermethodobject('normsamplgauss', 'varnorm')
 
     elif scspnormdermethod == 'intgauss':
-        obj = scspnormdermethodobject('intgauss', 'nonormalization', gamma)
+        obj = scspnormdermethodobject('intgauss', 'nonormalization')
 
     elif scspnormdermethod == 'intgaussvar':
-        obj = scspnormdermethodobject('intgauss', 'varnorm', gamma)
+        obj = scspnormdermethodobject('intgauss', 'varnorm')
 
     elif scspnormdermethod == 'linintgauss':
-        obj = scspnormdermethodobject('linintgauss', 'nonormalization', gamma)
+        obj = scspnormdermethodobject('linintgauss', 'nonormalization')
 
     elif scspnormdermethod == 'linintgaussvar':
-        obj = scspnormdermethodobject('linintgauss', 'varnorm', gamma)
+        obj = scspnormdermethodobject('linintgauss', 'varnorm')
 
     else:
         raise ValueError(f'Scale-space derivative method {scspnormdermethod} \
@@ -1264,6 +1328,7 @@ def variance(spatfilter : np.ndarray) -> np.ndarray:
         # Choose convention to fit deltafcn()
         y = np.linspace(-ysize/2, ysize/2-1, ysize)
 
+    # According to our convention, the y-direction goes in the upward direction
     y = -y
 
     xv, yv = np.meshgrid(x, y, indexing='xy')
@@ -1299,6 +1364,7 @@ def filtermean(spatfilter : np.ndarray) -> (float, float) :
         # Choose convention to fit deltafcn()
         y = np.linspace(-ysize/2, ysize/2-1, ysize)
 
+    # According to our convention, the y-direction goes in the upward direction
     y = -y
 
     xv, yv = np.meshgrid(x, y, indexing='xy')
@@ -1869,3 +1935,246 @@ def dyyyymask5() -> np.ndarray :
                      [0, 0, +6, 0, 0], \
                      [0, 0, -4, 0, 0], \
                      [0, 0, +1, 0, 0]])
+
+
+def make1Dgaussfilter(
+        sigma : float,
+        scspmethod : str = 'discgauss',
+        epsilon : float = 0.00000001
+    ) -> np.array :
+    """Computes a discrete approximation of a Gaussian filter at scale sigma for
+    different types of discrete approximations, given an upper bound epsilon
+    on the truncation error at the tails.
+
+    The following discrete approximation methods have been implemented:
+
+      'discgauss' - the discrete analogue of the Gaussian kernel
+      'samplgauss' - the sampled Gaussian kernel
+      'normsamplgauss' - the normalized sampled Gaussian kernel
+      'intgauss' - the integrated Gaussian kernel
+      'linintgauss' - the linearily interpolated and integrated Gaussian kernel
+
+    The discrete analogue of the Gaussian kernel has the best theoretical properties 
+    of these kernels, in the sense that it obeys both (i) non-enhancement of local 
+    extrema over a 2-D spatial domain and (ii) non-creation of local extrema from 
+    any finer to any coarser level of scale for any 1-D signal. The filter coefficents 
+    are (iii) guaranteed to be in the interval [0, 1] and do (iv) exactly sum to one 
+    for an infinitely sized filter. (v) The spatial standard deviation of the discrete 
+    kernel is also equal to the sigma value.
+
+    The different methods have the possible advantages (+) and disadvantages (-):
+
+    'discgauss' + guarantees non-enhancement of local extrema over a 2-D image domain
+                + guarantees non-creation of new extrema from any finer to any
+                  coarser level of scale over a 1-D signal domain
+                + the kernel values are guaranteed to be in the interval [0, 1]
+                + the kernel values are guaranteed to sum to 1 over an infinite domain
+                + no scale offset at all in the spatial discretization
+
+    'samplgauss' + no added scale offset in the spatial discretization
+                 + for sufficiently large scale values a good approximation of
+                   the underlying continuous model
+                 - the kernel values may become greater than 1 for small values of sigma
+                 - the kernel values do not sum up to one
+                 - for very small values of sigma, the kernels have a too narrow shape
+
+    'normsamplgauss' + no added scale offset in the spatial discretization
+                     + formally the kernel values are guaranteed to be in the 
+                       interval [0, 1]
+                     + formally the kernel values are guaranteed to sum up to 1 
+                     - the complementary normalization of the kernel is ad hoc
+                     - for very small values of sigma, the kernels have a too narrow 
+                       shape
+
+    'intgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+               + the kernel values are guaranteed to sum up to 1 over an infinite domain
+               - the box integration introduces a scale offset of 1/12 at coarser scales
+
+    'linintgauss' + the kernel values are guaranteed to be in the interval [0, 1]
+                  - the triangular window integration introduces a scale offset of 1/6
+                    at coarser scales
+
+    Besides being a string, the argument scspmethod may also be an object
+    having the attributes scspmethod.methodname and scspmethod.epsilon.
+
+    The parameter epsilon specifies an upper bound on the relative truncation error
+    for separable filtering over a D-dimensional domain.
+    """
+    if isinstance(scspmethod, str):
+        scspmethodname = scspmethod
+    else:
+        scspmethodname = scspmethod.methodname
+        epsilon = scspmethod.epsilon
+
+    if scspmethodname == 'discgauss':
+        return make1Ddiscgaussfilter(sigma, epsilon)
+
+    if scspmethodname == 'samplgauss':
+        return make1Dsamplgaussfilter(sigma, epsilon)
+
+    if scspmethodname == 'normsamplgauss':
+        return make1Dnormsamplgaussfilter(sigma, epsilon)
+
+    if scspmethodname == 'intgauss':
+        return make1Dintgaussfilter(sigma, epsilon)
+
+    if scspmethodname == 'linintgauss':
+        return make1Dlinintgaussfilter(sigma, epsilon)
+
+    raise ValueError(f"Gaussian smoothing discretization method \
+{scspmethodname} not implemented")
+
+
+def make1Ddiscgaussderfilter(
+        order : int,
+        sigma : float,
+        N : int
+        ) -> np.ndarray :
+    """Generates a discrete derivative approximation kernel corresponding to the
+    equivalent effect of performing smoothing with the discrete analogue of the
+    Gaussian kernel with standard deviation sigma followed by central differences 
+    to estimate derivative approximations. The filter is truncated at the ends 
+    at -N and -N.
+
+    Note: This kernel is not intended for actual computations of discrete derivative
+    approximations. It is solely intended for analysis of the equivalent effect of
+    smoothing and for graphical visualization.
+    """
+    x = np.linspace(-N, N, 1 + 2*N)
+    T = ive(x, sigma**2)
+
+    if order == 0:
+        return T
+
+    if order == 1:
+        dx = np.array([-1/2, 0, 1/2])
+        return correlate1d(T, dx)
+
+    if order == 2:
+        dxx = np.array([1, -2, 1])
+        return correlate1d(T, dxx)
+
+    if order == 3:
+        dxxx = np.array([-1/2, +1, 0, -1, 1/2])
+        return correlate1d(T, dxxx)
+
+    if order == 4:
+        dxxxx = np.array([1, -4, 6, -4, 1])
+        return correlate1d(T, dxxxx)
+
+    raise ValueError(f"Not implemented for order {order}")
+
+
+def make1Dsamplgaussdifffilter(
+        order : int,
+        sigma : float,
+        N : int
+        ) -> np.ndarray :
+    """Generates a discrete derivative approximation kernel corresponding to the
+    equivalent effect of performing discrete smoothing with the sampled Gaussian 
+    kernel followed by central differences to estimate derivative approximations. 
+
+    Note: This kernel is not intended for actual computations of discrete derivative
+    approximations. It is solely intended for analysis of the equivalent effect of
+    smoothing and for graphical visualization.
+    """
+    x = np.linspace(-N, N, 1 + 2*N)
+    T = gauss(x, sigma)
+
+    if order == 0:
+        return T
+
+    if order == 1:
+        dx = np.array([-1/2, 0, 1/2])
+        return correlate1d(T, dx)
+
+    if order == 2:
+        dxx = np.array([1, -2, 1])
+        return correlate1d(T, dxx)
+
+    if order == 3:
+        dxxx = np.array([-1/2, +1, 0, -1, 1/2])
+        return correlate1d(T, dxxx)
+
+    if order == 4:
+        dxxxx = np.array([1, -4, 6, -4, 1])
+        return correlate1d(T, dxxxx)
+
+    raise ValueError(f"Not implemented for order {order}")
+
+
+def make1Dnormsamplgaussdifffilter(
+        order : int,
+        sigma : float,
+        N : int
+        ) -> np.ndarray :
+    """Generates a discrete derivative approximation kernel corresponding to the
+    equivalent effect of performing discrete smoothing with the normalized 
+    sampled Gaussian kernel followed by central differences to estimate derivative approximations. 
+
+    Note: This kernel is not intended for actual computations of discrete derivative
+    approximations. It is solely intended for analysis of the equivalent effect of
+    smoothing and for graphical visualization.
+    """
+    x = np.linspace(-N, N, 1 + 2*N)
+    T = gauss(x, sigma)
+    T = T/np.sum(T)
+    
+    if order == 0:
+        return T
+
+    if order == 1:
+        dx = np.array([-1/2, 0, 1/2])
+        return correlate1d(T, dx)
+
+    if order == 2:
+        dxx = np.array([1, -2, 1])
+        return correlate1d(T, dxx)
+
+    if order == 3:
+        dxxx = np.array([-1/2, +1, 0, -1, 1/2])
+        return correlate1d(T, dxxx)
+
+    if order == 4:
+        dxxxx = np.array([1, -4, 6, -4, 1])
+        return correlate1d(T, dxxxx)
+
+    raise ValueError(f"Not implemented for order {order}")
+
+
+def make1Dintgaussdifffilter(
+        order : int,
+        sigma : float,
+        N : int
+        ) -> np.ndarray :
+    """Generates a discrete derivative approximation kernel corresponding to the
+    equivalent effect of performing discrete smoothing with the integrated Gaussian 
+    kernel followed by central differences to estimate derivative approximations. 
+
+    Note: This kernel is not intended for actual computations of discrete derivative
+    approximations. It is solely intended for analysis of the equivalent effect of
+    smoothing and for graphical visualization.
+    """
+    x = np.linspace(-N, N, 1 + 2*N)
+    T = scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
+
+    if order == 0:
+        return T
+
+    if order == 1:
+        dx = np.array([-1/2, 0, 1/2])
+        return correlate1d(T, dx)
+
+    if order == 2:
+        dxx = np.array([1, -2, 1])
+        return correlate1d(T, dxx)
+
+    if order == 3:
+        dxxx = np.array([-1/2, +1, 0, -1, 1/2])
+        return correlate1d(T, dxxx)
+
+    if order == 4:
+        dxxxx = np.array([1, -4, 6, -4, 1])
+        return correlate1d(T, dxxxx)
+
+    raise ValueError(f"Not implemented for order {order}")

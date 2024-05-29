@@ -36,6 +36,32 @@ approximations of the Gaussian kernel, please see the documentation
 strings for the respective functions in the source code in 
 [discscsp.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/discscsp.py).
 
+## gaussders: Gaussian Derivative Toolbox for Python
+
+This module comprises:
+
+-- functions for computing discrete approximations of Gaussian
+	derivatives, based on convolving the image data with sampled Gaussian derivative
+	kernels or integrated Gaussian derivative kernels.
+
+-- functions for computing differential expressions in terms of scale-normalized
+    Gaussian derivatives for different purposes in feature detection
+    from image data, such as edge detection, interest point detection
+    (blob detection or corner detection) and ridge detection, based on
+    the above discrete derivative approximations obtained by convolving
+    the input image with either sampled Gaussian derivative kernels or
+    integrated Gaussian derivative kernels.
+	
+For examples of how to apply these functions for computing scale-space
+features, please see the enclosed Jupyter notebook 
+[gaussdersdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/gaussdersdemo.ipynb).
+
+For more technical descriptions about the respective functions, as well
+as explanations of the theoretical properties for different discrete
+approximations of the Gaussian kernel, please see the documentation
+strings for the respective functions in the source code in
+[gaussders.py](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/gaussders.py).
+
 ## affscsp : Affine Scale-Space and Scale-Space Derivative Toolbox for Python:
 
 This module comprises:

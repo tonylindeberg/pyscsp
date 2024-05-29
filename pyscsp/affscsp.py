@@ -38,10 +38,11 @@ directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
 """
 
-from math import exp, pi, sqrt, cos, sin, ceil
+from math import exp, pi, sqrt, cos, sin
 import numpy as np
 from scipy.ndimage import correlate
-from pyscsp.discscsp import dirdermask, truncerrtransf, gaussfiltsize
+from pyscsp.discscsp import dirdermask
+from pyscsp.gaussders import N_from_epsilon_2D
 
 
 def CxxCxyCyyfromlambda12phi(
@@ -561,42 +562,3 @@ def scnormnumdirdersamplaffgausskernel(
     scnormmask = scnormaffdirdermask(sigma1, sigma2, phi, phiorder, orthorder)
 
     return correlate(affgausskernel, scnormmask)
-
-
-## ==>> Preliminary inclusion of this function
-def N_from_epsilon_2D(
-        order : int,
-        sigma : float,
-        epsilon : float
-    ) -> int :
-    """Computes an estimate of a minimum bound N for truncating a Gaussian
-    derivative kernel of a given order to ensure that the relative truncation 
-    error for 2-D Gaussian derivative convolution is below epsilon.
-    """
-    # Convert the 2-D error bound for a 1-D error bound for separable convolution
-    eps1D = truncerrtransf(epsilon, 2)
-
-    return N_from_epsilon_1D(order, sigma, eps1D)
-
-
-def N_from_epsilon_1D(
-        order : int,
-        sigma : float,
-        epsilon : float
-    ) -> int :
-    """Computes an estimate of a minimum bound N for truncating a Gaussian
-    derivative kernel of a given order to ensure that the relative truncation 
-    error for 1-D Gaussian derivative convolution is below epsilon.
-    """
-    if order == 0:
-        return ceil(gaussfiltsize(sigma, epsilon, 1))
-
-    # ==>> Preliminary solution to be similar to corresponding error estimates
-    # ==>> for the discrete approximations to Gaussian derivative responsens
-    # ==>> computed by applying small-support discrete derivative approximation
-    # ==>> molecules to the result of discrete scale-space smoothing
-    return 1 + order + ceil(gaussfiltsize(sigma, epsilon / 2**order, 1))
-
-
-
-

@@ -1,10 +1,14 @@
 """Scale Space Toolbox for PyTorch
 
-Extend subsets of the discscsp and affscsp modules to PyTorch:
+Extends subsets of the discscsp, gaussders and affscsp modules to PyTorch:
 
 (discscp) For computing discrete scale-space smoothing by convolution with the discrete
 analogue of the Gaussian kernel and for computing discrete derivative approximations
 by applying central difference operators to the smoothed data. 
+
+(gaussders) For computing discrete approximations of Gaussian derivatives in terms
+of either sampled Gaussian derivative kernels or integrated Gaussian derivative
+kernels.
 
 (affscsp) Functions for performing the equivalent effect of convolving an image with
 discrete approximations of directional derivatives of affine Gaussian
@@ -15,7 +19,7 @@ of spatial diffentiation.
 References:
 
 Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+Pattern Analysis and Machine Intelligence, 12(3): 234-254.
 
 Lindeberg (1993a) "Discrete derivative approximations with scale-space properties: 
 A basis for low-level feature detection", Journal of Mathematical Imaging and Vision, 
@@ -35,6 +39,9 @@ Heliyon 7(1): e05897: 1-20.
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
+
+Lindeberg (2023) "Discrete approximations of Gaussian smoothing and Gaussian 
+derivatives", arXiv preprint arXiv:2311.11317.
 """
 
 import math
@@ -48,8 +55,10 @@ from pyscsp.discscsp import gaussfiltsize, variance1D
 # ==>> Import from other Python package awaiting a full PyTorch interface for
 # ==>> the modified Bessel functions that determine the filter coefficients
 # ==>> for the discrete analogue of the Gaussian kernel
-from pyscsp.discscsp import make1Ddiscgaussfilter
+from pyscsp.discscsp import make1Ddiscgaussfilter, make1Ddiscgaussderfilter
 
+# ==>> The following functions for affine scale space do not have a full
+# ==>> PyTorch interface either
 from pyscsp.affscsp import samplaffgausskernel, scnormaffdirdermask
 
 
@@ -112,9 +121,12 @@ def make1Dgaussfilter(
     References:
 
     Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
-    Pattern Analysis and Machine Intelligence, 12(3): 234--254.
+    Pattern Analysis and Machine Intelligence, 12(3): 234-254.
 
     Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
+
+    Lindeberg (2023) "Discrete approximations of Gaussian smoothing and Gaussian 
+    derivatives", arXiv preprint arXiv:2311.11317.
     """
     if scspmethod == 'discgauss':
         # ==>> Note! Here sigma is not PyTorch variable to allow for scale
@@ -308,6 +320,182 @@ def filtersdev(pytorchfilter : torch.tensor) -> float :
     """Returns the actual spatial standard deviation of a 1-D PyTorch filter
     """
     return math.sqrt(variance1D(pytorchfilter.numpy()))
+
+
+def make1Dgaussderfilter(
+        order : int,
+        sigma : Union[float, torch.Tensor],
+        N : int,
+        gaussdermethod : str = 'discgaussder'
+    ) -> torch.Tensor :
+    """Generates a mask for discrete approximation of a Gaussian derivative
+    operator of a given order and at a given scale sigma by separable 
+    filtering, using either of the methods:
+
+    'samplgaussder'     - the sampled Gaussian derivative kernel with variance-based 
+                          scale normalization
+    'intgaussder'       - the integrated Gaussian derivative kernel with 
+                          variance-based scale normalization
+    'discgaussder'      - discrete derivative approximations applied to the discrete 
+                          analogue of the Gaussian kernel
+
+    The different discretization methods have the following relative advantages (+)
+    and disadvantages (-):
+
+    'samplgaussder': + no added scale offset in the spatial discretization
+                     - for small values of sigma, the discrete kernel values may sum up 
+                       to a value larger than the integral of the corresponding
+                       continuous kernel
+                     - for very small values of sigma, the kernels have a too 
+                       narrow shape
+
+    'intgaussder': + the discrete kernel values may sum up to a value close to the
+                     L1-norm of the the continuous kernel over an infinite domain
+                   - the box integration introduces a scale offset of 1/12 at 
+                     coarser scales
+
+    'discgaussder': + the discrete kernels obey discrete scale-space properties
+                    + the kernels obey an exact cascade smoothing property over
+                      scales
+
+    The parameter N should specify the requested truncation bound for
+    the filter for |x| > N, where N has to be determined in a complementary
+    manner given some bound epsilon on the truncation error, for the given
+    order of differentiation and the given scale value sigma.
+
+    The scale parameter sigma should be a 0-D PyTorch tensor if sigma is to be
+    learned. Then, the discrete analogue of the Gaussian kernel cannot, however,
+    be used, since the modified Bessel functions of integer order, underlying
+    the implementation of that kernel lack a complete PyTorch interface.
+
+    References:
+
+    Lindeberg (1990) "Scale-space for discrete signals", IEEE Transactions on
+    Pattern Analysis and Machine Intelligence, 12(3): 234-254.
+
+    Lindeberg (1993) Scale-Space Theory in Computer Vision, Springer.
+
+    Lindeberg (2023) "Discrete approximations of Gaussian smoothing and Gaussian 
+    derivatives", arXiv preprint arXiv:2311.11317.
+    """
+    if gaussdermethod == 'samplgaussder':
+        return make1Dsamplgaussderfilter(order, sigma, N)
+
+    if gaussdermethod == 'intgaussder':
+        return make1Dintgaussderfilter(order, sigma, N)
+
+    if gaussdermethod == 'discgaussder':
+        return make1Ddiscgaussderfilter(order, sigma, N)
+
+    raise ValueError(f"Gaussian derivative discretization method \
+{gaussdermethod} not implemented")
+
+
+def make1Dsamplgaussderfilter(
+        order : int,
+        sigma : float,
+        N : int
+    ) -> torch.Tensor :
+    """Generates a sampled Gaussian derivative kernel of a given order 
+    and with standard deviation sigma, truncated at the ends at -N and -N.
+
+    Note: At very fine scales, the discrete kernel values may sum up 
+    to a value larger than the integral of the corresponding continuous
+    kernel, and the kernels may have a too narrow shape.
+    """
+    x = torch.linspace(-N, N, 1 + 2*N)
+
+    if order == 0:
+        return gauss0derkernel(x, sigma)
+
+    if order == 1:
+        return gauss1derkernel(x, sigma)
+
+    if order == 2:
+        return gauss2derkernel(x, sigma)
+
+    if order == 3:
+        return gauss3derkernel(x, sigma)
+
+    if order == 4:
+        return gauss4derkernel(x, sigma)
+
+    raise ValueError(f"Not implemented for order {order}")
+
+
+def gauss0derkernel(x : np.ndarray, sigma : float = 1.0) -> torch.Tensor :
+    """Computes a Gaussian function, given a set of spatial x-coordinates and 
+    sigma value specifying the standard deviation of the kernel.
+    """
+    return 1 / (math.sqrt( 2 * pi) * sigma) \
+           * torch.exp(-(x**2 / (2 * sigma**2)))
+
+
+def gauss1derkernel(x : np.ndarray, sigma : float = 1.0) -> torch.Tensor :
+    """Computes a first-order derivative of a Gaussian function given a set of spatial 
+    x-coordinates and sigma value specifying the standard deviation of the kernel.
+    """
+    return (-x / sigma**2) / (math.sqrt(2 * pi) * sigma) \
+           * torch.exp(-(x**2 / (2 * sigma**2)))
+
+
+def gauss2derkernel(x : np.ndarray, sigma : float = 1.0) -> torch.Tensor :
+    """Computes a second-order derivative of a Gaussian function given a set of spatial 
+    x-coordinates and sigma value specifying the standard deviation of the kernel.
+    """
+    return ((x**2 - sigma**2) / sigma**4) / \
+           (math.sqrt(2 * pi) * sigma) * torch.exp(-(x**2 / (2 * sigma**2)))
+
+
+def gauss3derkernel(x : np.ndarray, sigma : float = 1.0) -> torch.Tensor :
+    """Computes a third-order derivative of a Gaussian function given a set of spatial 
+    x-coordinates and sigma value specifying the standard deviation of the kernel.
+    """
+    return (-(x**3 - 3 * sigma**2 * x) / sigma**6) / \
+           (math.sqrt(2 * pi) * sigma) * torch.exp(-(x**2 / (2 * sigma**2)))
+
+
+def gauss4derkernel(x : np.ndarray, sigma : float = 1.0) -> torch.Tensor :
+    """Computes a fourth-order derivative of a Gaussian function given a set of spatial 
+    x-coordinates and sigma value specifying the standard deviation of the kernel.
+    """
+    return ((x**4 - 6 * sigma**2 * x**2 + 3 * sigma**4) / sigma**8) / \
+           (math.sqrt(2 * pi) * sigma) * torch.exp(-(x**2 / (2 * sigma**2)))
+
+
+def make1Dintgaussderfilter(
+        order : int,
+        sigma : Union[float, torch.Tensor],
+        N : int
+        ) -> torch.Tensor :
+    """Generates an integrated Gaussian derivative kernel of a given order and with 
+    standard deviation sigma, truncated at the ends at -N and -N.
+
+    The integrated Gaussian derivative kernel is defined by integrating the 
+    corresponding continuous Gaussian derivative kernel over the support region 
+    of each pixel.
+
+    Note: At coarser scales, the box integration over each pixel support
+    regions adds a scale offset to the kernel.
+    """
+    x = torch.linspace(-N, N, 1 + 2*N)
+
+    if order == 0:
+        return scaled_erf(x + 0.5, sigma) - scaled_erf(x - 0.5, sigma)
+
+    if order == 1:
+        return gauss0derkernel(x + 0.5, sigma) - gauss0derkernel(x - 0.5, sigma)
+
+    if order == 2:
+        return gauss1derkernel(x + 0.5, sigma) - gauss1derkernel(x - 0.5, sigma)
+
+    if order == 3:
+        return gauss2derkernel(x + 0.5, sigma) - gauss2derkernel(x - 0.5, sigma)
+
+    if order == 4:
+        return gauss3derkernel(x + 0.5, sigma) - gauss3derkernel(x - 0.5, sigma)
+
+    raise ValueError(f"Not implemented for order {order}")
 
 
 def makesamplaffgausskernel(
