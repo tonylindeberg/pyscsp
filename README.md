@@ -292,7 +292,9 @@ of different orders are to be computed at the same scale level,
 compared to explicit convolutions with either sampled Gaussian
 derivative kernels or integrated Gaussian derivative kernels. 
 
-Remark: To avoid possible misunderstandings, this pyscsp package does
+## Remark: 
+
+To avoid possible misunderstandings, this pyscsp package does
 not contain the full implementations needed to reproduce the methods
 in the above papers, only a subset of basic functionalities regarding
 the first layer of computations on the image data.
