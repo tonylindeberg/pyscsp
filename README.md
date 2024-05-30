@@ -292,7 +292,7 @@ of different orders are to be computed at the same scale level,
 compared to explicit convolutions with either sampled Gaussian
 derivative kernels or integrated Gaussian derivative kernels. 
 
-## Remark: 
+## Remarks: 
 
 To avoid possible misunderstandings, this pyscsp package does
 not contain the full implementations needed to reproduce the methods
