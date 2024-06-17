@@ -185,11 +185,12 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
-Lindeberg (2023) "Discrete approximations of Gaussian smoothing and
-Gaussian derivatives", arXiv preprint arXiv:2311.11317.
-([preprint](https://doi.org/10.48550/arXiv.2311.11317))
+Lindeberg (2024a) "Discrete approximations of Gaussian smoothing and
+Gaussian derivatives", Journal of Mathematical Imaging and Vision,
+https://doi.org/10.1007/s10851-024-01196-9.
+([Open Access](https://doi.org/10.1007/s10851-024-01196-9)
 
-Lindeberg (2024) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", arXiv preprint arXiv:2405.05095.
+Lindeberg (2024b) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", arXiv preprint arXiv:2405.05095.
 ([preprint](https://doi.org/10.48550/arXiv.2405.05095))
 
 
@@ -274,14 +275,14 @@ layer, as a linear combination of scale-normalized Gaussian derivative
 responses, as a basic concept for defining provably scale-covariant
 and scale-invariant deep networks.
 
-The paper (Lindeberg 2023) gives an in-depth treatment of different
+The paper (Lindeberg 2024a) gives an in-depth treatment of different
 ways of approximating the Gaussian smoothing operation and the
 Gaussian derivative operators that underlie the computation of
 scale-space features. In this respect, this paper provides a
 theoretical foundation for many of the implementations in
 the pyscsp package.
 
-The paper (Lindeberg 2024) extends the treatment of discrete
+The paper (Lindeberg 2024b) extends the treatment of discrete
 approximations of Gaussian derivative operators to a characterization
 of properties of the hybrid discretization methods, based on
 combinations of a first stage of spatial smoothing, with either the
@@ -301,8 +302,8 @@ the first layer of computations on the image data.
 
 The original implementations for most of the above papers have been
 performed in C or Matlab. Only for the papers (Lindeberg 2022),
-(Lindeberg 2023) and (Lindeberg 2024), the experimental work has been based on Python
-implementations.
+(Lindeberg 2024a) and (Lindeberg 2024b), 
+the experimental work has been based on Python implementations.
 
 The more general set of references listed here is, however, provided
 to point to a wider context, in which the basic functions in the
