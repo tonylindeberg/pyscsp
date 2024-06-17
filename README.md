@@ -183,12 +183,12 @@ Heliyon 7(1): e05897: 1-20.
 
 Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative 
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
-([Open Access)](https://doi.org/10.1007/s10851-021-01057-9))
+([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
 Lindeberg (2024a) "Discrete approximations of Gaussian smoothing and
 Gaussian derivatives", Journal of Mathematical Imaging and Vision,
 https://doi.org/10.1007/s10851-024-01196-9.
-([Open Access](https://doi.org/10.1007/s10851-024-01196-9)
+([Open Access](https://doi.org/10.1007/s10851-024-01196-9))
 
 Lindeberg (2024b) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", arXiv preprint arXiv:2405.05095.
 ([preprint](https://doi.org/10.48550/arXiv.2405.05095))
