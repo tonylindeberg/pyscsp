@@ -74,7 +74,7 @@ This module comprises:
 
 For examples of how to apply these functions for computing scale-space
 features, please see the enclosed Jupyter notebook 
-[affscspdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/pyscsp/affscspdemo.py).
+[affscspdemo.ipynb](https://github.com/tonylindeberg/pyscsp/blob/main/affscspdemo.ipynb).
 
 For more technical descriptions about the respective functions, please
 see the documentation strings for the respective functions in the source
