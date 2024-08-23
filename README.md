@@ -104,7 +104,7 @@ code in
 
 These modules can be installed using pip.
 
-To install only the discscsp and affscsp modules
+To install only the discscsp, gaussders and affscsp modules
 (without installing the torchscsp module which requires a larger
 installation of PyTorch) do:
 ```bash
