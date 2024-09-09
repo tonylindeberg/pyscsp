@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyscsp"
-version = "1.0.0"
+version = "1.0.1"
 description = "Scale-Space Toolbox for Python."
 authors = ["Tony Lindeberg <tony@kth.se>"]
 license = "MIT"
