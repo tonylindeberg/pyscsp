@@ -185,13 +185,13 @@ Lindeberg (2022) "Scale-covariant and scale-invariant Gaussian derivative
 networks", Journal of Mathematical Imaging and Vision, 64(3): 223-242.
 ([Open Access](https://doi.org/10.1007/s10851-021-01057-9))
 
-Lindeberg (2024a) "Discrete approximations of Gaussian smoothing and
+Lindeberg (2024) "Discrete approximations of Gaussian smoothing and
 Gaussian derivatives", Journal of Mathematical Imaging and Vision,
 66(5): 759-800.
 ([Open Access](https://doi.org/10.1007/s10851-024-01196-9))
 
-Lindeberg (2024b) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", arXiv preprint arXiv:2405.05095.
-([preprint](https://doi.org/10.48550/arXiv.2405.05095))
+Lindeberg (2025) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", Frontiers in Signal Processing, 4: 144784: 1-12.
+([preprint](https://doi.org/10.3389/frsip.2024.1447841))
 
 
 ## Relations between the scientific papers and concepts in this code:
@@ -258,7 +258,7 @@ detecting image features in image data.
 The papers (Lindeberg 2013a) and (Lindeberg 2021) demonstrate how
 the spatial component of the receptive fields of simple cells in
 the primary visual cortex can be well modelled by directional
-derivatives of affine Gaussian kernels. In the code below, we
+derivatives of affine Gaussian kernels. In the affscsp module, we
 provide functions for generating such kernels corresponding to
 directional derivatives of affine Gaussian kernels and for computing
 the effect of convolving images with such kernels.
@@ -275,7 +275,7 @@ layer, as a linear combination of scale-normalized Gaussian derivative
 responses, as a basic concept for defining provably scale-covariant
 and scale-invariant deep networks.
 
-The paper (Lindeberg 2024a) gives an in-depth treatment of different
+The paper (Lindeberg 2024) gives an in-depth treatment of different
 ways of approximating the Gaussian smoothing operation and the
 Gaussian derivative operators that underlie the computation of
 scale-space features. In this respect, this paper provides both
@@ -283,7 +283,7 @@ the theoretical foundations and quantitative performance
 characterizations for many of the implementations in
 the pyscsp package.
 
-The paper (Lindeberg 2024b) extends the treatment of discrete
+The paper (Lindeberg 2025) extends the treatment of discrete
 approximations of Gaussian derivative operators to a characterization
 of properties of the hybrid discretization methods, based on
 combinations of a first stage of spatial smoothing, with either the
@@ -303,7 +303,7 @@ the first layer of computations on the image data.
 
 The original implementations for most of the above papers have been
 performed in C or Matlab. Only for the papers (Lindeberg 2022),
-(Lindeberg 2024a) and (Lindeberg 2024b), 
+(Lindeberg 2024) and (Lindeberg 2025), 
 the experimental work has been based on Python implementations.
 
 The more general set of references listed here is, however, provided
