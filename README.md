@@ -191,7 +191,7 @@ Gaussian derivatives", Journal of Mathematical Imaging and Vision,
 ([Open Access](https://doi.org/10.1007/s10851-024-01196-9))
 
 Lindeberg (2025) "Approximation properties relative to continuous scale space for hybrid discretizations of Gaussian derivative operators", Frontiers in Signal Processing, 4: 144784: 1-12.
-([preprint](https://doi.org/10.3389/frsip.2024.1447841))
+([Open Access](https://doi.org/10.3389/frsip.2024.1447841))
 
 
 ## Relations between the scientific papers and concepts in this code:
